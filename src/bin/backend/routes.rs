@@ -2,18 +2,20 @@ use super::models::*;
 use rocket_contrib::Json;
 use serde_json::Value as JsonValue;
 use std::io;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
+use super::StaticContent;
 use rocket::response::NamedFile;
+use rocket::State;
 
 #[get("/")]
-fn index() -> io::Result<NamedFile> {
-    NamedFile::open("dist/index.html")
+fn index(static_content: State<StaticContent>) -> io::Result<NamedFile> {
+    NamedFile::open(Path::new(&static_content.0).join("index.html"))
 }
 
 #[get("/main.js")]
-fn files() -> io::Result<NamedFile> {
-    NamedFile::open("dist/main.js")
+fn files(static_content: State<StaticContent>) -> io::Result<NamedFile> {
+    NamedFile::open(Path::new(&static_content.0).join("main.js"))
 }
 
 #[get("/api/<path..>")]
