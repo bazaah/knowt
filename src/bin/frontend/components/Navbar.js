@@ -1,7 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
+import NavbarFile from "./NavbarFile";
 import { connect } from "react-redux";
 import { fetchContent } from "../redux/actions/contentActions";
+import { bindActionCreators } from "redux";
 
 class NavbarFolder extends React.Component {
   render() {
@@ -14,23 +16,10 @@ class NavbarFolder extends React.Component {
   }
 }
 
-class NavbarFile extends React.Component {
-  render() {
-    const name = this.props.file;
-    return (
-      <tr>
-        <td onClick={() => alert("poke")}>{name}</td>
-      </tr>
-    );
-  }
-}
-
 class Navbar extends React.Component {
   componentWillMount() {
-    this.props.onFetchContent();
+    this.props.actions.fetchContent();
   }
-  // console.log(this.props.fileList.result);
-  // console.log(this.props.files);
 
   render() {
     const rows = [];
@@ -39,10 +28,16 @@ class Navbar extends React.Component {
     if (this.props.fileList) {
       this.props.fileList.map(file => {
         if (file.parent !== lastFolder) {
-          rows.push(<NavbarFolder folder={file.parent} key={file.parent} />);
+          rows.push(<NavbarFolder folder={file.parent} key={file.id} />);
         }
-        rows.push(<NavbarFile file={file.name} key={file.name} />);
-        lastFolder = file.parent; /* what does this do? */
+        rows.push(
+          <NavbarFile
+            file={file.name}
+            key={file.id}
+            {...this.boundActionCreator}
+          />
+        );
+        lastFolder = file.parent;
       });
     }
 
@@ -60,15 +55,14 @@ class Navbar extends React.Component {
 }
 
 Navbar.propTypes = {
-  onFetchContent: PropTypes.func.isRequired,
   fileList: PropTypes.array.isRequired
 };
 
-const mapDispatchToProps = dispatch => {
+function mapDispatchToProps(dispatch) {
   return {
-    onFetchContent: () => dispatch(fetchContent())
+    actions: bindActionCreators({ fetchContent }, dispatch)
   };
-};
+}
 
 const mapStateToProps = state => ({
   fileList: state.content.fileList.result

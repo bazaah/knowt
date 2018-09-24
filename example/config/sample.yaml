@@ -1,29 +1,28 @@
-markdown:
-  content: |
-    # This is some markdown content in YAML that will be output as an <h1>.
+content: |
+  # This is some markdown content in YAML that will be output as an <h1>.
 
-    This will be output as a paragraph tag.
+  This will be output as a paragraph tag.
 
-    So will this!
+  So will this!
 
-    ## This is a secondary header
+  ## This is a secondary header
 
-    * These
-    * Are
-    * List
-    * Items
+  * These
+  * Are
+  * List
+  * Items
 
-    ### Code
+  ### Code
 
-    ```js
-    var React = require('react');
-    ```
+  ```js
+  var React = require('react');
+  ```
 
-    ### Tables
+  ### Tables
 
-    | Oh | Look |
-    | --- | ----|
-    | a | table |
+  | Oh | Look |
+  | --- | ----|
+  | a | table |
 environment: production
 classes:
   nfs::server:
