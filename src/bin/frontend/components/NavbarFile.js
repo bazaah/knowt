@@ -5,12 +5,20 @@ import { fetchYaml } from "../redux/actions/contentActions";
 import { bindActionCreators } from "redux";
 
 class NavbarFile extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.onPress = this.onPress.bind(this);
+  }
+
+  onPress(fileName) {
+    this.props.fetchYaml("api/config/".concat(fileName));
+  }
   render() {
     const name = this.props.file;
-    const press = this.props.actions.fetchYaml;
     return (
       <tr>
-        <td onClick={press}>{name}</td>
+        <td onClick={() => this.onPress(name)}>{name}</td>
       </tr>
     );
   }
@@ -18,7 +26,7 @@ class NavbarFile extends React.Component {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ fetchYaml }, dispatch)
+    fetchYaml: url => dispatch(fetchYaml(url))
   };
 }
 

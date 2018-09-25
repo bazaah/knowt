@@ -1,7 +1,15 @@
-import { FETCH_CONTENT, FETCH_YAML } from "../actions/types";
+import {
+  FETCH_YAML,
+  CONTENT_HAS_ERROR,
+  CONTENT_IS_LOADING,
+  CONTENT_FETCH_SUCCESS,
+  FILEDIR_HAS_ERROR,
+  FILEDIR_IS_LOADING,
+  FILEDIR_FETCH_SUCCESS
+} from "../actions/types";
 
 const initialState = {
-  fileList: { result: [{}] },
+  fileDirList: { result: [{}] },
   content: {},
   yamlForMarkdown: {
     metadata: "stuff'n'things",
@@ -14,17 +22,26 @@ const initialState = {
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case FETCH_CONTENT:
-      console.log("reducing filelist");
-      return {
-        ...state,
-        fileList: action.payload
-      };
     case FETCH_YAML:
-      console.log("reducing filelist");
+      console.log("reducing yaml");
       return {
         ...state,
         yamlForMarkdown: action.payload
+      };
+    case FILEDIR_FETCH_SUCCESS:
+      return {
+        ...state,
+        fileDirList: action.payload
+      };
+    case FILEDIR_HAS_ERROR:
+      return {
+        ...state,
+        fileDirError: action.error
+      };
+    case FILEDIR_IS_LOADING:
+      return {
+        ...state,
+        fileDirIsLoading: action.loading
       };
     default:
       return state;

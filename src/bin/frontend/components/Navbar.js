@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import NavbarFile from "./NavbarFile";
 import { connect } from "react-redux";
-import { fetchContent } from "../redux/actions/contentActions";
+import { fetchFileDir } from "../redux/actions/contentActions";
 import { bindActionCreators } from "redux";
 
 class NavbarFolder extends React.Component {
@@ -17,11 +17,15 @@ class NavbarFolder extends React.Component {
 }
 
 class Navbar extends React.Component {
-  componentWillMount() {
-    this.props.actions.fetchContent();
+  componentDidMount() {
+    this.props.fetchFileDir("/api/dir");
   }
 
   render() {
+    if (this.props.fileDirLoading) {
+      return <p>Loading...</p>;
+    }
+
     const rows = [];
     let lastFolder = null;
 
@@ -30,13 +34,7 @@ class Navbar extends React.Component {
         if (file.parent !== lastFolder) {
           rows.push(<NavbarFolder folder={file.parent} key={file.id} />);
         }
-        rows.push(
-          <NavbarFile
-            file={file.name}
-            key={file.id}
-            {...this.boundActionCreator}
-          />
-        );
+        rows.push(<NavbarFile file={file.name} key={file.id} />);
         lastFolder = file.parent;
       });
     }
@@ -55,18 +53,22 @@ class Navbar extends React.Component {
 }
 
 Navbar.propTypes = {
-  fileList: PropTypes.array.isRequired
+  fileList: PropTypes.array.isRequired,
+  fileDirLoading: PropTypes.bool
 };
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({ fetchContent }, dispatch)
+    fetchFileDir: url => dispatch(fetchFileDir(url))
   };
 }
 
-const mapStateToProps = state => ({
-  fileList: state.content.fileList.result
-});
+const mapStateToProps = state => {
+  return {
+    fileList: state.content.fileDirList.result,
+    fileDirLoading: state.content.fileIsDirLoading
+  };
+};
 
 export default connect(
   mapStateToProps,
