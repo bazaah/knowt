@@ -1,5 +1,4 @@
-export const FETCH_YAML = "FETCH_YAML";
-
+// Reducer types for content
 export const CONTENT_HAS_ERROR = "CONTENT_HAS_ERROR";
 export const CONTENT_IS_LOADING = "CONTENT_IS_LOADING";
 export const CONTENT_FETCH_SUCCESS = "CONTENT_FETCH_SUCCESS";
@@ -7,3 +6,7 @@ export const CONTENT_FETCH_SUCCESS = "CONTENT_FETCH_SUCCESS";
 export const FILEDIR_HAS_ERROR = "FILEDIR_HAS_ERROR";
 export const FILEDIR_IS_LOADING = "FILEDIR_IS_LOADING";
 export const FILEDIR_FETCH_SUCCESS = "FILEDIR_FETCH_SUCCESS";
+
+// Reducer types for bansa
+export const MARKDOWN_VIEW = "MARKDOWN_VIEW";
+export const EDITOR_VIEW = "EDITOR_VIEW";

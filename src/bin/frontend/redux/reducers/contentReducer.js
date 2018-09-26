@@ -1,5 +1,4 @@
 import {
-  FETCH_YAML,
   CONTENT_HAS_ERROR,
   CONTENT_IS_LOADING,
   CONTENT_FETCH_SUCCESS,
@@ -11,7 +10,7 @@ import {
 const initialState = {
   fileDirList: { result: [{}] },
   content: {},
-  yamlForMarkdown: {
+  contentData: {
     metadata: "stuff'n'things",
     result: {
       content:
@@ -22,12 +21,6 @@ const initialState = {
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case FETCH_YAML:
-      console.log("reducing yaml");
-      return {
-        ...state,
-        yamlForMarkdown: action.payload
-      };
     case FILEDIR_FETCH_SUCCESS:
       return {
         ...state,
@@ -42,6 +35,21 @@ export default function(state = initialState, action) {
       return {
         ...state,
         fileDirIsLoading: action.loading
+      };
+    case CONTENT_FETCH_SUCCESS:
+      return {
+        ...state,
+        contentData: action.payload
+      };
+    case CONTENT_HAS_ERROR:
+      return {
+        ...state,
+        contentError: action.error
+      };
+    case CONTENT_IS_LOADING:
+      return {
+        ...state,
+        contentLoading: action.loading
       };
     default:
       return state;

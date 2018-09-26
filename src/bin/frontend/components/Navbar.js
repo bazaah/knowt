@@ -66,7 +66,7 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = state => {
   return {
     fileList: state.content.fileDirList.result,
-    fileDirLoading: state.content.fileIsDirLoading
+    fileDirLoading: state.content.fileDirIsLoading
   };
 };
 

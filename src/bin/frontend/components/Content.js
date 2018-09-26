@@ -4,12 +4,12 @@ const ReactMarkdown = require("react-markdown");
 
 class Content extends React.Component {
   render() {
-    return <ReactMarkdown source={this.props.yaml} />;
+    return <ReactMarkdown source={this.props.markdown} />;
   }
 }
 
 const mapStateToProps = state => ({
-  yaml: state.content.yamlForMarkdown.result.content
+  markdown: state.content.contentData.result.content
 });
 
 export default connect(

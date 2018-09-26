@@ -1,11 +1,12 @@
 import React from "react";
+import { connect } from "react-redux";
 
 class Menubar extends React.Component {
   render() {
     return (
       <div>
-        <button name="Display">Display</button>
-        <button name="Editor">Editor</button>
+        <button onClick={() => console.log("display button")}>Display</button>
+        <button onClick={() => console.log("editor button")}>Editor</button>
       </div>
     );
   }

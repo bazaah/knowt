@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { fetchYaml } from "../redux/actions/contentActions";
+import { fetchContent } from "../redux/actions/contentActions";
 import { bindActionCreators } from "redux";
 
 class NavbarFile extends React.Component {
@@ -12,7 +12,7 @@ class NavbarFile extends React.Component {
   }
 
   onPress(fileName) {
-    this.props.fetchYaml("api/config/".concat(fileName));
+    this.props.fetchContent("api/config/".concat(fileName));
   }
   render() {
     const name = this.props.file;
@@ -26,7 +26,7 @@ class NavbarFile extends React.Component {
 
 function mapDispatchToProps(dispatch) {
   return {
-    fetchYaml: url => dispatch(fetchYaml(url))
+    fetchContent: url => dispatch(fetchContent(url))
   };
 }
 
