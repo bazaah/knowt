@@ -7,10 +7,10 @@ import { bindActionCreators } from "redux";
 
 class NavbarFolder extends React.Component {
   render() {
-    const path = this.props.folder;
+    const folder = this.props.folder;
     return (
       <tr>
-        <th>{path}</th>
+        <th>{folder}</th>
       </tr>
     );
   }

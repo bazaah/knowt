@@ -9,7 +9,6 @@ import {
 
 const initialState = {
   fileDirList: { result: [{}] },
-  content: {},
   contentData: {
     metadata: "stuff'n'things",
     result: {

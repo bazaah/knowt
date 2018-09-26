@@ -9,7 +9,6 @@ import {
 
 export function fetchFileDir(url) {
   return dispatch => {
-    console.log("fetching filedir");
     dispatch(fileDirLoading(true));
 
     fetch(url)
@@ -23,15 +22,18 @@ export function fetchFileDir(url) {
 
 export function fetchContent(url) {
   return dispatch => {
-    console.log("fetching content");
     dispatch(contentLoading(true));
 
     fetch(url)
       .then(res => {
+        if (res.status !== 200) {
+          throw Error(res.result);
+        }
         dispatch(contentLoading(false));
         return res.json();
       })
-      .then(data => dispatch(contentFetchSuccess(data)));
+      .then(data => dispatch(contentFetchSuccess(data)))
+      .catch(() => dispatch(contentError(true)));
   };
 }
 

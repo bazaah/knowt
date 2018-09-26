@@ -8,5 +8,8 @@ export const FILEDIR_IS_LOADING = "FILEDIR_IS_LOADING";
 export const FILEDIR_FETCH_SUCCESS = "FILEDIR_FETCH_SUCCESS";
 
 // Reducer types for bansa
-export const MARKDOWN_VIEW = "MARKDOWN_VIEW";
-export const EDITOR_VIEW = "EDITOR_VIEW";
+export const SET_BANSA_FILTER = "SET_BANSA_FILTER";
+export const BansaFilter = {
+  MARKDOWN_VIEW: "MARKDOWN_VIEW",
+  EDITOR_VIEW: "EDITOR_VIEW"
+};
