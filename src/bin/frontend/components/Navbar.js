@@ -34,7 +34,9 @@ class Navbar extends React.Component {
         if (file.parent !== lastFolder) {
           rows.push(<NavbarFolder folder={file.parent} key={file.id} />);
         }
-        rows.push(<NavbarFile file={file.name} key={file.id} />);
+        rows.push(
+          <NavbarFile file={file.name} path={file.path} key={file.id} />
+        );
         lastFolder = file.parent;
       });
     }

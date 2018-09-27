@@ -12,7 +12,8 @@ class NavbarFile extends React.Component {
   }
 
   onPress(fileName) {
-    this.props.fetchContent("api/config/".concat(fileName));
+    const path = "api/".concat(this.props.path.slice(1).join("/")).concat("/"); // This is why I hate js array manipulation TODO: improve backend data so I can avoid this
+    this.props.fetchContent(path.concat(fileName));
   }
   render() {
     const name = this.props.file;

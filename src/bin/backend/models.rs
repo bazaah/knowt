@@ -123,7 +123,7 @@ pub fn dir_tree() -> Option<Vec<JsonValue>> {
         if entry.path().is_file() && is_yaml(&entry) {
             let file_name = entry.path().file_name()?.to_str()?;
             let mut split_path: Vec<&str> = entry.path().parent()?.to_str()?.split("/").collect();
-            vec.push(json!({"name": file_name, "parent": split_path.pop()?})); // Data for populating initial frontend state
+            vec.push(json!({"path": split_path, "name": file_name, "parent": split_path.pop()?})); // Data for populating initial frontend state
         };
     }
     Some(vec)
