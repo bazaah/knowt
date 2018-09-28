@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/bin/frontend/index.html",
@@ -7,11 +7,11 @@ const htmlPlugin = new HtmlWebPackPlugin({
 
 module.exports = {
   entry: {
-    main: './src/bin/frontend/index.js'
+    main: "./src/bin/frontend/index.js"
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'main.js'
+    path: path.resolve(__dirname, "dist"),
+    filename: "main.js"
   },
   devServer: {
     host: "zebra.stemmet.dot", // 172.17.17.223
@@ -50,7 +50,7 @@ module.exports = {
             options: {
               modules: true,
               importLoaders: 1,
-              localIdentName: "[name]_[local]_[hash:base64]",
+              localIdentName: "[name]_[local]_[hash:base64:5]",
               sourceMap: true,
               minimize: true
             }

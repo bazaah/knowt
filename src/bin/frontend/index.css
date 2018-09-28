@@ -1,70 +1,69 @@
 /* Changing universal style to border-box */
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
+}
+body {
+  background-color: #616161;
+  color: #212121;
+}
+
+.wrapper {
+  max-width: 100%;
+  margin: 0 auto;
+  font: 1.2em Helvetica, arial, sans-serif;
+}
+
+.wrapper > * {
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(16, [col-start] 1fr);
+  grid-gap: 8px;
+}
+.wrapper > * {
+  grid-column: col-start / span 16;
+}
+
+.flex_content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.flex_content > div {
+  width: 85%;
+}
+
+@media (min-width: 699px) {
+  .header {
+    grid-row: 1 / min-content;
   }
-  body {
-    background-color: #616161;
-    color: #212121;
+  .navbar {
+    grid-column: col-start / span 3;
+    grid-row: 3;
   }
-  
-  .wrapper {
-    max-width: 100%;
-    margin: 0 auto;
-    font: 1.2em Helvetica, arial, sans-serif;
+  .content,
+  .main-footer {
+    grid-column: col-start 4 / span 13;
   }
-  
-  .wrapper > * {
-    background-color: #f5f5f5;
-    border-radius: 5px;
-    padding: 5px;
+}
+
+@media (min-width: 700px) {
+  .header {
+    grid-row: 1 / min-content;
   }
-  
-  .wrapper {
-    display: grid;
-    grid-template-columns: repeat(16, [col-start] 1fr);
-    grid-gap: 8px;
+  .navbar {
+    grid-column: col-start / span 1;
+    grid-row: 2 / 4;
   }
-  .wrapper > * {
+  .content {
+    grid-column: col-start 2 / span 15;
+    grid-row: 2 / 4;
+  }
+  .footer {
     grid-column: col-start / span 16;
   }
-  
-  .flex_content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .flex_content > div {
-    width: 85%;
-  }
-  
-  @media (min-width: 699px) {
-    .header {
-      grid-row: 1 / min-content;
-    }
-    .navbar {
-      grid-column: col-start / span 3;
-      grid-row: 3;
-    }
-    .content,
-    .main-footer {
-      grid-column: col-start 4 / span 13;
-    }
-  }
-  
-  @media (min-width: 700px) {
-    .header {
-      grid-row: 1 / min-content;
-    }
-    .navbar {
-      grid-column: col-start / span 1;
-      grid-row: 2 / 4;
-    }
-    .content {
-      grid-column: col-start 2 / span 15;
-      grid-row: 2 / 4;
-    }
-    .footer {
-      grid-column: col-start / span 16;
-    }
-  }
-  
+}

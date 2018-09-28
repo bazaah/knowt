@@ -3,9 +3,10 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 
 import style from "./index.css";
+
+import Content from "./components/Content";
 import Navbar from "./components/Navbar";
 import Menubar from "./components/Menubar";
-import Content from "./components/Content";
 import store from "./redux/store";
 
 class App extends React.Component {
