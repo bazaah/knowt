@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import NavbarFile from "./NavbarFile";
 import { connect } from "react-redux";
 import { fetchFileDir } from "../redux/actions/contentActions";
-import { bindActionCreators } from "redux";
 
 class NavbarFolder extends React.Component {
   render() {
