@@ -4,7 +4,10 @@ import {
   CONTENT_FETCH_SUCCESS,
   FILEDIR_HAS_ERROR,
   FILEDIR_IS_LOADING,
-  FILEDIR_FETCH_SUCCESS
+  FILEDIR_FETCH_SUCCESS,
+  UPDATE_ERROR,
+  UPDATE_LOADING,
+  UPDATE_SUCCESS
 } from "./types";
 
 export function fetchFileDir(url) {
@@ -34,6 +37,29 @@ export function fetchContent(url) {
       })
       .then(data => dispatch(contentFetchSuccess(data)))
       .catch(() => dispatch(contentError(true)));
+  };
+}
+
+export function updateContent(url, updateData) {
+  return dispatch => {
+    dispatch(updateLoading(true));
+
+    fetch(url, {
+      method: "PUT",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(updateData)
+    })
+      .then(res => {
+        if (res.status !== 200) {
+          throw Error(res.result);
+        }
+        dispatch(updateLoading(false));
+        return res.json();
+      })
+      .then(status => dispatch(updateSuccess(status)))
+      .catch(() => dispatch(updateError(true)));
   };
 }
 
@@ -76,5 +102,26 @@ export function contentFetchSuccess(content) {
   return {
     type: CONTENT_FETCH_SUCCESS,
     payload: content
+  };
+}
+
+export function updateError(bool) {
+  return {
+    type: UPDATE_ERROR,
+    error: bool
+  };
+}
+
+export function updateLoading(bool) {
+  return {
+    type: UPDATE_LOADING,
+    loading: bool
+  };
+}
+
+export function updateSuccess(status) {
+  return {
+    type: UPDATE_SUCCESS,
+    status: status
   };
 }

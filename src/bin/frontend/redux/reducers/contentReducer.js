@@ -4,7 +4,10 @@ import {
   CONTENT_FETCH_SUCCESS,
   FILEDIR_HAS_ERROR,
   FILEDIR_IS_LOADING,
-  FILEDIR_FETCH_SUCCESS
+  FILEDIR_FETCH_SUCCESS,
+  UPDATE_ERROR,
+  UPDATE_LOADING,
+  UPDATE_SUCCESS
 } from "../actions/types";
 
 const initialState = {
@@ -12,8 +15,7 @@ const initialState = {
   contentData: {
     metadata: "stuff'n'things",
     result: {
-      content:
-        "# This is some markdown content in YAML that will be output as an <h1>.\n\nThis will be output as a paragraph tag.\n\nSo will this!\n\n## This is a secondary header\n\n* These\n* Are\n* List\n* Items\n\n### Code\n\n```js\nvar React = require('react');\n```\n\n### Tables\n\n| Oh | Look |\n| ------ | ------- |\n| a | table |\n"
+      content: "# Please click a file"
     }
   }
 };
@@ -49,6 +51,21 @@ export default function(state = initialState, action) {
       return {
         ...state,
         contentLoading: action.loading
+      };
+    case UPDATE_SUCCESS:
+      return {
+        ...state,
+        updateStatus: action.status
+      };
+    case UPDATE_ERROR:
+      return {
+        ...state,
+        updateError: action.error
+      };
+    case UPDATE_LOADING:
+      return {
+        ...state,
+        updateLoading: action.loading
       };
     default:
       return state;

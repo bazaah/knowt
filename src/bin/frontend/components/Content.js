@@ -12,7 +12,7 @@ class Content extends React.Component {
     if (this.props.bansaFilter == BansaFilter.MARKDOWN_VIEW) {
       return <ReactMarkdown source={this.props.markdown} />;
     } else if (this.props.bansaFilter == BansaFilter.EDITOR_VIEW) {
-      return <ReactCodeMirror markdown={this.props.markdown} />;
+      return <ReactCodeMirror />;
     }
   }
 }
