@@ -48,12 +48,12 @@ pub fn new(file: Json<JsonValue>, path: PathBuf) -> Json<JsonValue> {
     data = "<data>"
 )]
 pub fn update(data: Json<JsonValue>, key: String, path: PathBuf) -> Json<JsonValue> {
-    let status = match update_data(data.into_inner(), key, path) {
-        Ok(()) => Json(json!({"status": 200})),
+    let updated_data = match update_data(data.into_inner(), key, path) {
+        Ok(res) => Json(json!({"status": 200, "result": res})),
         Err(e) => Json(json!({"status": 500, "result": formated_error(&e)}
         )),
     };
-    status
+    updated_data
 }
 
 #[get("/api/dir")]

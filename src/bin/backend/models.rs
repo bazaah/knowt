@@ -50,7 +50,7 @@ pub fn create(file: JsonValue, path: PathBuf) -> Result<()> {
 // path is the relative path from the SETTINGS defined root
 // key being the key to the value that is being updated
 // It returns nothing; or an error
-pub fn update_data(update: JsonValue, key: String, path: PathBuf) -> Result<()> {
+pub fn update_data(content_update: JsonValue, key: String, path: PathBuf) -> Result<JsonValue> {
     let mut path_buf = PathBuf::from(
         SETTINGS
             .read()
@@ -60,14 +60,15 @@ pub fn update_data(update: JsonValue, key: String, path: PathBuf) -> Result<()> 
     path_buf.push(path);
     let file = File::open(&path_buf)?;
     let k = key.as_str(); // Takes a &str slice of key
-    let mut yaml_file: JsonValue = ::serde_yaml::from_reader(file)?;
+    let update = json!({ k: content_update });
+    let mut yaml_file: JsonValue = ::serde_yaml::from_reader(&file)?;
     // Ensures that the key exists in both the update data and the file being updated
     if yaml_file.get(k).is_some() && update.get(k).is_some() {
         *yaml_file.get_mut(k).unwrap() = update.get(k).unwrap().to_owned(); // Unwrap(s) cannot fail due to the above check
         let yaml_str = ::serde_yaml::to_string(&yaml_file)?;
         fs::write(path_buf, yaml_str)?;
     }
-    Ok(())
+    Ok(yaml_file)
 }
 
 // Generic error handling for errors that users can fix
