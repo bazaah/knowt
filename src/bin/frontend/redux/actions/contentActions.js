@@ -43,7 +43,7 @@ export function fetchContent(url) {
 export function updateContent(url, updateData) {
   return dispatch => {
     dispatch(updateLoading(true));
-
+    console.log(JSON.stringify(updateData));
     fetch(url, {
       method: "PUT",
       headers: {
@@ -58,7 +58,7 @@ export function updateContent(url, updateData) {
         dispatch(updateLoading(false));
         return res.json();
       })
-      .then(status => dispatch(updateSuccess(status)))
+      .then(data => dispatch(updateSuccess(data)))
       .catch(() => dispatch(updateError(true)));
   };
 }
@@ -119,9 +119,9 @@ export function updateLoading(bool) {
   };
 }
 
-export function updateSuccess(status) {
+export function updateSuccess(update) {
   return {
     type: UPDATE_SUCCESS,
-    status: status
+    payload: update
   };
 }

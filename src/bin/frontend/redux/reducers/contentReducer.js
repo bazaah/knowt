@@ -55,7 +55,7 @@ export default function(state = initialState, action) {
     case UPDATE_SUCCESS:
       return {
         ...state,
-        updateStatus: action.status
+        contentData: action.payload
       };
     case UPDATE_ERROR:
       return {
