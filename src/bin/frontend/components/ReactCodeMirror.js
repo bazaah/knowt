@@ -10,16 +10,20 @@ class ReactCodeMirror extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { value: this.props.markdown };
+    this.state = {};
     this.handleBlur = this.handleBlur.bind(this);
   }
+
+  componentDidMount() {
+    this.setState({ value: this.props.markdown });
+  }
+
   handleBlur(data) {
     const path = "api/content/config/sample.yaml";
     this.props.updateContent(path, data);
   }
 
   render() {
-    const testvaluename = this.state.value;
     const options = {
       mode: "gfm",
       theme: "railscasts",
@@ -35,7 +39,7 @@ class ReactCodeMirror extends React.Component {
         onChange={(editor, value) => {
           console.log("control", { value });
         }}
-        onBlur={() => this.handleBlur(testvaluename)}
+        onBlur={() => this.handleBlur(this.state.value)}
       />
     );
   }
