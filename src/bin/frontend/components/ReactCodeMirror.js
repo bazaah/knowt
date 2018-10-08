@@ -19,7 +19,7 @@ class ReactCodeMirror extends React.Component {
   }
 
   handleBlur(data) {
-    const path = "api/content/config/sample.yaml";
+    const path = "api/content/".concat(this.props.workingFile);
     this.props.updateContent(path, data);
   }
 
@@ -46,7 +46,8 @@ class ReactCodeMirror extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  markdown: state.content.contentData.result.content
+  markdown: state.content.contentData.result.content,
+  workingFile: state.content.workingFile
 });
 
 function mapDispatchToProps(dispatch) {
