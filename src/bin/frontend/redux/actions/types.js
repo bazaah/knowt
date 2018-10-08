@@ -11,6 +11,8 @@ export const UPDATE_ERROR = "UPDATE_ERROR";
 export const UPDATE_LOADING = "UPDATE_LOADING";
 export const UPDATE_SUCCESS = "UPDATE_SUCCESS";
 
+export const WORKING_FILE = "WORKING_FILE";
+
 // Reducer types for bansa
 export const SET_BANSA_FILTER = "SET_BANSA_FILTER";
 export const BansaFilter = {
