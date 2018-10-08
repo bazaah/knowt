@@ -18,6 +18,12 @@ class ReactCodeMirror extends React.Component {
     this.setState({ value: this.props.markdown });
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.markdown !== this.props.markdown) {
+      this.setState({ value: this.props.markdown });
+    }
+  }
+
   handleBlur(data) {
     const path = "api/content/".concat(this.props.workingFile);
     this.props.updateContent(path, data);
