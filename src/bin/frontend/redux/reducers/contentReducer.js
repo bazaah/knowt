@@ -7,7 +7,8 @@ import {
   FILEDIR_FETCH_SUCCESS,
   UPDATE_ERROR,
   UPDATE_LOADING,
-  UPDATE_SUCCESS
+  UPDATE_SUCCESS,
+  WORKING_FILE
 } from "../actions/types";
 
 const initialState = {
@@ -66,6 +67,11 @@ export default function(state = initialState, action) {
       return {
         ...state,
         updateLoading: action.loading
+      };
+    case WORKING_FILE:
+      return {
+        ...state,
+        workingFile: action.file
       };
     default:
       return state;

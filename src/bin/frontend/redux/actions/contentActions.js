@@ -7,7 +7,8 @@ import {
   FILEDIR_FETCH_SUCCESS,
   UPDATE_ERROR,
   UPDATE_LOADING,
-  UPDATE_SUCCESS
+  UPDATE_SUCCESS,
+  WORKING_FILE
 } from "./types";
 
 export function fetchFileDir(url) {
@@ -29,6 +30,7 @@ export function fetchContent(url) {
 
     fetch(url)
       .then(res => {
+        // this doesn't work, investigate correct method
         if (res.status !== 200) {
           throw Error(res.result);
         }
@@ -43,7 +45,7 @@ export function fetchContent(url) {
 export function updateContent(url, updateData) {
   return dispatch => {
     dispatch(updateLoading(true));
-    console.log(JSON.stringify(updateData));
+    console.log(url);
     fetch(url, {
       method: "PUT",
       headers: {
@@ -123,5 +125,12 @@ export function updateSuccess(update) {
   return {
     type: UPDATE_SUCCESS,
     payload: update
+  };
+}
+
+export function workingFile(file) {
+  return {
+    type: WORKING_FILE,
+    file: file
   };
 }
