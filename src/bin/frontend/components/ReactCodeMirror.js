@@ -42,9 +42,7 @@ class ReactCodeMirror extends React.Component {
         onBeforeChange={(editor, data, value) => {
           this.setState({ value });
         }}
-        onChange={(editor, value) => {
-          console.log("control", { value });
-        }}
+        onChange={(editor, value) => {}}
         onBlur={() => this.handleBlur(this.state.value)}
       />
     );

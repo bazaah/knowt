@@ -45,7 +45,6 @@ export function fetchContent(url) {
 export function updateContent(url, updateData) {
   return dispatch => {
     dispatch(updateLoading(true));
-    console.log(url);
     fetch(url, {
       method: "PUT",
       headers: {
