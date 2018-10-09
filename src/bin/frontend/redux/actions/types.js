@@ -19,3 +19,5 @@ export const BansaFilter = {
   MARKDOWN_VIEW: "MARKDOWN_VIEW",
   EDITOR_VIEW: "EDITOR_VIEW"
 };
+
+export const SHOW_NEW_FILE_MODAL = "SHOW_NEW_FILE_MODAL";
