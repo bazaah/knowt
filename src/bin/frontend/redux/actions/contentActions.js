@@ -8,6 +8,9 @@ import {
   UPDATE_ERROR,
   UPDATE_LOADING,
   UPDATE_SUCCESS,
+  NEW_FILE_ERROR,
+  NEW_FILE_LOADING,
+  NEW_FILE_SUCCESS,
   WORKING_FILE
 } from "./types";
 
@@ -60,6 +63,28 @@ export function updateContent(url, updateData) {
         return res.json();
       })
       .then(data => dispatch(updateSuccess(data)))
+      .catch(() => dispatch(updateError(true)));
+  };
+}
+
+export function newContent(url, newFile) {
+  return dispatch => {
+    dispatch(newFileLoading(true));
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(newFile)
+    })
+      .then(res => {
+        if (res.status !== 200) {
+          throw Error(res.status);
+        }
+        dispatch(newFileLoading(false));
+        return res.json();
+      })
+      .then(code => dispatch(newFileSuccess(code)))
       .catch(() => dispatch(updateError(true)));
   };
 }
@@ -124,6 +149,27 @@ export function updateSuccess(update) {
   return {
     type: UPDATE_SUCCESS,
     payload: update
+  };
+}
+
+export function newFileError(bool) {
+  return {
+    type: NEW_FILE_ERROR,
+    error: bool
+  };
+}
+
+export function newFileLoading(bool) {
+  return {
+    type: NEW_FILE_LOADING,
+    loading: bool
+  };
+}
+
+export function newFileSuccess(code) {
+  return {
+    type: NEW_FILE_SUCCESS,
+    status: code
   };
 }
 

@@ -8,6 +8,9 @@ import {
   UPDATE_ERROR,
   UPDATE_LOADING,
   UPDATE_SUCCESS,
+  NEW_FILE_ERROR,
+  NEW_FILE_LOADING,
+  NEW_FILE_SUCCESS,
   WORKING_FILE
 } from "../actions/types";
 
@@ -67,6 +70,21 @@ export default function(state = initialState, action) {
       return {
         ...state,
         updateLoading: action.loading
+      };
+    case NEW_FILE_SUCCESS:
+      return {
+        ...state,
+        newFileCreated: action.status
+      };
+    case NEW_FILE_ERROR:
+      return {
+        ...state,
+        newFileError: action.error
+      };
+    case NEW_FILE_LOADING:
+      return {
+        ...state,
+        newFileLoading: action.loading
       };
     case WORKING_FILE:
       return {

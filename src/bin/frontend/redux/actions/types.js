@@ -11,6 +11,10 @@ export const UPDATE_ERROR = "UPDATE_ERROR";
 export const UPDATE_LOADING = "UPDATE_LOADING";
 export const UPDATE_SUCCESS = "UPDATE_SUCCESS";
 
+export const NEW_FILE_ERROR = "NEW_FILE_ERROR";
+export const NEW_FILE_LOADING = "NEW_FILE_LOADING";
+export const NEW_FILE_SUCCESS = "NEW_FILE_SUCCESS";
+
 export const WORKING_FILE = "WORKING_FILE";
 
 // Reducer types for bansa
