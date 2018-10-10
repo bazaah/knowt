@@ -1,7 +1,9 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import ReactModal from "react-modal";
 import { showNewFileModal } from "../redux/actions/bansaActions";
+import { newContent, workingFile, fetchFileDir, fetchContent } from "../redux/actions/contentActions";
 
 ReactModal.setAppElement("#root");
 
@@ -29,9 +31,14 @@ class NewFileModal extends React.Component {
   }
 
   handleSubmit(event) {
-    const fullpath = this.state.pathValue.concat(this.state.nameValue);
-    console.log(fullpath);
     event.preventDefault();
+    const path = this.state.pathValue.concat(this.state.nameValue);
+    const fullpath = "api/".concat(path);
+    console.log(fullpath);
+    this.props.newContent(fullpath, { content: "# New file created by Knowt" });
+    this.props.workingFile(path);
+    this.props.fetchFileDir("api/dir");
+    this.props.fetchContent(fullpath)
     this.props.showNewFileModal(false);
   }
 
@@ -73,13 +80,26 @@ class NewFileModal extends React.Component {
   }
 }
 
+NewFileModal.propTypes = {
+  modalVisible: PropTypes.bool.isRequired,
+  showNewFileModal: PropTypes.func.isRequired,
+  newContent: PropTypes.func.isRequired,
+  workingFile: PropTypes.func.isRequired,
+  fetchContent: PropTypes.func.isRequired,
+  fetchFileDir: PropTypes.func.isRequired
+};
+
 const mapStateToProps = state => ({
   modalVisible: state.bansa.modalVisible
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    showNewFileModal: bool => dispatch(showNewFileModal(bool))
+    showNewFileModal: bool => dispatch(showNewFileModal(bool)),
+    newContent: (url, data) => dispatch(newContent(url, data)),
+    workingFile: filePath => dispatch(workingFile(filePath)),
+    fetchFileDir: url => dispatch(fetchFileDir(url)),
+    fetchContent: url => dispatch(fetchContent(url))
   };
 }
 
