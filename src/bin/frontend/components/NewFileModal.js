@@ -3,7 +3,12 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import ReactModal from "react-modal";
 import { showNewFileModal } from "../redux/actions/bansaActions";
-import { newContent, workingFile, fetchFileDir, fetchContent } from "../redux/actions/contentActions";
+import {
+  newContent,
+  workingFile,
+  fetchFileDir,
+  fetchContent
+} from "../redux/actions/contentActions";
 
 ReactModal.setAppElement("#root");
 
@@ -32,13 +37,21 @@ class NewFileModal extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const path = this.state.pathValue.concat(this.state.nameValue);
-    const fullpath = "api/".concat(path);
+    const path = this.state.pathValue.trim();
+    const name = this.state.nameValue.trim();
+
+    if (!path.endsWith("/")) {
+      path + "/";
+      console.log(path);
+    }
+
+    const formatted_path = path.concat(name).trim();
+    const fullpath = "api/".concat(formatted_path);
     console.log(fullpath);
     this.props.newContent(fullpath, { content: "# New file created by Knowt" });
-    this.props.workingFile(path);
+    this.props.workingFile(formatted_path);
     this.props.fetchFileDir("api/dir");
-    this.props.fetchContent(fullpath)
+    this.props.fetchContent(fullpath);
     this.props.showNewFileModal(false);
   }
 
@@ -56,7 +69,7 @@ class NewFileModal extends React.Component {
               type="text"
               name="pathValue"
               value={this.state.pathValue}
-              placeholder="path/to/file"
+              placeholder="Path/to/file/"
               onChange={this.handleChange}
             />
           </label>
@@ -67,7 +80,7 @@ class NewFileModal extends React.Component {
               type="text"
               name="nameValue"
               value={this.state.nameValue}
-              placeholder="Coolnewfile"
+              placeholder="File Name"
               onChange={this.handleChange}
             />
           </label>
