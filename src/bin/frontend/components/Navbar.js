@@ -55,7 +55,12 @@ class Navbar extends React.Component {
 
 Navbar.propTypes = {
   fileList: PropTypes.array.isRequired,
+  fetchFileDir: PropTypes.func.isRequired,
   fileDirLoading: PropTypes.bool
+};
+
+NavbarFolder.propTypes = {
+  folder: PropTypes.string
 };
 
 function mapDispatchToProps(dispatch) {

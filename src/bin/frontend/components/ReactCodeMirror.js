@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { updateContent } from "../redux/actions/contentActions";
 
@@ -47,6 +48,12 @@ class ReactCodeMirror extends React.Component {
       />
     );
   }
+}
+
+ReactCodeMirror.propTypes = {
+  markdown: PropTypes.string,
+  workingFile: PropTypes.string,
+  updateContent: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({

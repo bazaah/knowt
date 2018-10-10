@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import {
   setBansaFilter,
   showNewFileModal
@@ -30,6 +31,11 @@ class Menubar extends React.Component {
       </div>
     );
   }
+}
+
+Menubar.propTypes = {
+  setBansaFilter: PropTypes.func.isRequired,
+  showNewFileModal: PropTypes.func.isRequired
 }
 
 function mapDispatchToProps(dispatch) {
