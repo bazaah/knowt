@@ -37,12 +37,15 @@ class NewFileModal extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const path = this.state.pathValue.trim();
-    const name = this.state.nameValue.trim();
+    let path = this.state.pathValue.trim();
+    let name = this.state.nameValue.trim();
+    const rgYaml = /\.yaml$/;
 
     if (!path.endsWith("/")) {
-      path + "/";
-      console.log(path);
+      path = path + "/";
+    }
+    if (!rgYaml.test(name)) {
+      name = name + ".yaml";
     }
 
     const formatted_path = path.concat(name).trim();
