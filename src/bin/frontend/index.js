@@ -1,14 +1,20 @@
+// React + Redux for glueing together React and HTML
+// (ReactDOM), React and Redux (Provider) and
+// Redux with the local store (store)
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
+import store from "./redux/store";
 
+// Main css file containing the basic coloring
+// and grid layout
 import style from "./index.css";
 
+// Component blocks
 import Content from "./components/Content";
 import Navbar from "./components/Navbar";
 import Menubar from "./components/Menubar";
 import NewFileModal from "./components/NewFileModal";
-import store from "./redux/store";
 
 class App extends React.Component {
   render() {
@@ -33,5 +39,5 @@ class App extends React.Component {
     );
   }
 }
-
+// Ties App to an element in index.html with the id of "root"
 ReactDOM.render(<App />, document.getElementById("root"));

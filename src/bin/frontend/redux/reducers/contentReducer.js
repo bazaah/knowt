@@ -24,6 +24,10 @@ const initialState = {
   }
 };
 
+// Reducer for content state
+// Excluding default, every case must return
+// the previous state ('...state') and an optional alteration
+// Never mutate state, only copy
 export default function(state = initialState, action) {
   switch (action.type) {
     case FILEDIR_FETCH_SUCCESS:

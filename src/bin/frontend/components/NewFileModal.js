@@ -10,11 +10,18 @@ import {
   fetchContent
 } from "../redux/actions/contentActions";
 
+// Ensures the modal binds to the correct element
+// Must be set before any instance of <ReactModal> is called
 ReactModal.setAppElement("#root");
 
+// This component handles the user input needed to
+// create a new file. It wraps an instance of <ReactModal>
+// which wraps a form of input fields
+// It contains local state apart from the redux store
 class NewFileModal extends React.Component {
   constructor(props) {
     super(props);
+    // Local state initialized
     this.state = {
       pathValue: "",
       nameValue: ""
@@ -25,6 +32,7 @@ class NewFileModal extends React.Component {
     this.handleCloseModal = this.handleCloseModal.bind(this);
   }
 
+  // Function for handling form input from both fields
   handleChange(event) {
     const target = event.target;
     const value = target.name === "pathValue" ? target.value : target.value;
@@ -35,6 +43,9 @@ class NewFileModal extends React.Component {
     });
   }
 
+  // Function for handling form submission
+  // Formats user input and dispatches actions so that
+  // the system properly reflects the new file
   handleSubmit(event) {
     event.preventDefault();
     let path = this.state.pathValue.trim();
@@ -105,10 +116,12 @@ NewFileModal.propTypes = {
   fetchFileDir: PropTypes.func.isRequired
 };
 
+// Subscribes to the store
 const mapStateToProps = state => ({
   modalVisible: state.bansa.modalVisible
 });
 
+// Binds action creators to the indicated prop object
 function mapDispatchToProps(dispatch) {
   return {
     showNewFileModal: bool => dispatch(showNewFileModal(bool)),

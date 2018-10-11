@@ -1,11 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import {
   setBansaFilter,
   showNewFileModal
 } from "../redux/actions/bansaActions";
-import { connect } from "react-redux";
 
+
+// Concourse for user manipulation of the bansa
 class Menubar extends React.Component {
   constructor(props) {
     super(props);
@@ -38,6 +40,7 @@ Menubar.propTypes = {
   showNewFileModal: PropTypes.func.isRequired
 }
 
+//binds action creators to the indicated prop object
 function mapDispatchToProps(dispatch) {
   return {
     setBansaFilter: filter => dispatch(setBansaFilter(filter)),

@@ -14,6 +14,8 @@ import {
   WORKING_FILE
 } from "./types";
 
+// Async thunk meta action for file tree population
+// Returns an array of objects
 export function fetchFileDir(url) {
   return dispatch => {
     dispatch(fileDirLoading(true));
@@ -27,6 +29,9 @@ export function fetchFileDir(url) {
   };
 }
 
+// Async thunk meta action for fetching the content
+// of an individual file
+// Returns a json object
 export function fetchContent(url) {
   return dispatch => {
     dispatch(contentLoading(true));
@@ -45,6 +50,9 @@ export function fetchContent(url) {
   };
 }
 
+// Async thunk meta action for requesting an update
+// for a given file, with given data
+// Returns a json object
 export function updateContent(url, updateData) {
   return dispatch => {
     dispatch(updateLoading(true));
@@ -67,6 +75,9 @@ export function updateContent(url, updateData) {
   };
 }
 
+// Async thunk meta action for creating a file,
+// with the given path and data
+// Returns a status code
 export function newContent(url, newFile) {
   return dispatch => {
     dispatch(newFileLoading(true));
@@ -89,6 +100,15 @@ export function newContent(url, newFile) {
   };
 }
 
+// Action for setting the current working file
+export function workingFile(file) {
+  return {
+    type: WORKING_FILE,
+    file: file
+  };
+}
+
+// Action creators used in the meta actions
 export function fileDirError(bool) {
   return {
     type: FILEDIR_HAS_ERROR,
@@ -170,12 +190,5 @@ export function newFileSuccess(code) {
   return {
     type: NEW_FILE_SUCCESS,
     status: code
-  };
-}
-
-export function workingFile(file) {
-  return {
-    type: WORKING_FILE,
-    file: file
   };
 }

@@ -3,7 +3,8 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { fetchContent, workingFile } from "../redux/actions/contentActions";
 
-
+// Controls the rows representing files in Navbar
+// Handles requesting the corresponding file from the server
 class NavbarFile extends React.Component {
   constructor(props) {
     super(props);
@@ -34,8 +35,9 @@ NavbarFile.propTypes = {
   workingFile: PropTypes.func.isRequired,
   fetchContent: PropTypes.func.isRequired,
   file: PropTypes.string
-}
+};
 
+//binds action creators to the indicated prop object
 function mapDispatchToProps(dispatch) {
   return {
     fetchContent: url => dispatch(fetchContent(url)),

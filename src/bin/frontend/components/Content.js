@@ -5,6 +5,8 @@ import { BansaFilter } from "../redux/actions/types";
 import ReactCodeMirror from "./ReactCodeMirror";
 const ReactMarkdown = require("react-markdown");
 
+// Modulates the lense through which the current file
+// is being displayed 
 class Content extends React.Component {
     render() {
     if (this.props.bansaFilter == BansaFilter.MARKDOWN_VIEW) {
@@ -15,6 +17,7 @@ class Content extends React.Component {
   }
 }
 
+// Subscribes to the store
 const mapStateToProps = state => ({
   markdown: state.content.contentData.result.content,
   bansaFilter: state.bansa.bansaFilter
