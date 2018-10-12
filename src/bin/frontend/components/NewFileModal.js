@@ -49,33 +49,60 @@ class NewFileModal extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     let path = this.state.pathValue.trim();
+    let fmtPath = path.replace(/[^-0-9A-Za-z_]/g, " ");
+    fmtPath = fmtPath.replace(/\s+/g, "/");
+
+    if (!fmtPath.endsWith("/")) {
+      fmtPath = fmtPath + "/";
+    }
+
     let name = this.state.nameValue.trim();
-    const rgYaml = /\.yaml$/;
+    let fmtName = name.replace(/[^-0-9A-Za-z_.]/g, " ");
+    fmtName = fmtName.replace(/\s+/g, "-");
+    fmtName = fmtName.replace(/(?:\.ya?ml)$/, ".yaml");
 
-    if (!path.endsWith("/")) {
-      path = path + "/";
-    }
-    if (!rgYaml.test(name)) {
-      name = name + ".yaml";
+    if (!/\.yaml$/.test(fmtName)) {
+      fmtName = fmtName + ".yaml";
     }
 
-    const formatted_path = path.concat(name).trim();
-    const fullpath = "api/".concat(formatted_path);
-    console.log(fullpath);
-    this.props.newContent(fullpath, { content: "# New file created by Knowt" });
-    this.props.workingFile(formatted_path);
+    const fmtFilePath = fmtPath.concat(fmtName).trim();
+    const fullPath = "api/".concat(fmtFilePath);
+    console.log(fullPath);
+    this.props.newContent(fullPath, { content: "# New file created by Knowt" });
+    this.props.workingFile(fmtFilePath);
     this.props.fetchFileDir("api/dir");
-    this.props.fetchContent(fullpath);
-    this.props.showNewFileModal(false);
+    this.props.fetchContent(fullPath);
+    this.handleCloseModal(false);
   }
 
   handleCloseModal(bool) {
     this.props.showNewFileModal(bool);
+    this.setState({
+      pathValue: "",
+      nameValue: ""
+    });
   }
 
   render() {
+    const styleOverides = {
+      overlay: {
+        backgroundColor: "rgba(230, 230, 230, 0.75)"
+      },
+      content: {
+        display: "flex",
+        justifyContent: "center",
+        height: "150px",
+        width: "250px",
+        margin: " auto auto 70%"
+      }
+    };
+
     return (
-      <ReactModal isOpen={this.props.modalVisible}>
+      <ReactModal
+        isOpen={this.props.modalVisible}
+        onRequestClose={() => this.handleCloseModal(false)}
+        style={styleOverides}
+      >
         <form onSubmit={this.handleSubmit}>
           <label>
             Path <br />
