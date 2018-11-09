@@ -1,4 +1,5 @@
-use serde_json::Value as JsonValue; // simple alias for serde_json::Value
+use proc::yaml_deposit;
+use serde_json::Value as JsonValue; // simple alias for serde_json::Value\
 use settings::SETTINGS;
 use std::fs;
 use std::fs::File;
@@ -41,7 +42,7 @@ pub fn create(file: JsonValue, path: PathBuf) -> Result<()> {
     path_buf.push(path);
     fs::create_dir_all(path_buf.parent().unwrap())?; // Unwrap cannot fail, either the directory exists/is created or create_dir_all will return an error
     let new_file = ::serde_yaml::to_string(&file)?;
-    fs::write(path_buf, new_file)?;
+    yaml_deposit(new_file, path_buf);
     Ok(())
 }
 
@@ -66,7 +67,7 @@ pub fn update_data(content_update: JsonValue, key: String, path: PathBuf) -> Res
     if yaml_file.get(k).is_some() && update.get(k).is_some() {
         *yaml_file.get_mut(k).unwrap() = update.get(k).unwrap().to_owned(); // Unwrap(s) cannot fail due to the above check
         let yaml_str = ::serde_yaml::to_string(&yaml_file)?;
-        fs::write(path_buf, yaml_str)?;
+        yaml_deposit(yaml_str, path_buf);
     }
     Ok(yaml_file)
 }
