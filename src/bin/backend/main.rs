@@ -20,6 +20,7 @@ use settings::*;
 
 // Ties modules to main.rs
 mod models;
+mod proc;
 mod routes;
 mod settings;
 
@@ -35,5 +36,6 @@ fn main() {
                 .unwrap_or("dist/")
                 .to_string();
             Ok(rocket.manage(StaticContent(static_content)))
-        })).launch();
+        }))
+        .launch();
 }
