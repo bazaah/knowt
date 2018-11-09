@@ -1,6 +1,6 @@
 [package]
 name = "knowt"
-version = "0.3.2"
+version = "0.4.0"
 authors = ["Baz <github(a)luxolus.com>"]
 
 [dependencies]
@@ -16,4 +16,3 @@ serde_json = "1.0.32"
 lazy_static = "1.1.0"
 failure = "0.1.2"
 walkdir = "2.2.5"
-regex = "1.0.5"
