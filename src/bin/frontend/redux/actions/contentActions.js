@@ -55,6 +55,7 @@ export function fetchContent(url) {
 // Returns a json object
 export function updateContent(url, updateData) {
   return dispatch => {
+    console.log(JSON.stringify(updateData));
     dispatch(updateLoading(true));
     fetch(url, {
       method: "PUT",
