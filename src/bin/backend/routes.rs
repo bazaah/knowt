@@ -1,21 +1,36 @@
 use super::models::*;
 use rocket_contrib::Json;
 use serde_json::Value as JsonValue;
+use settings::SETTINGS;
 use std::io;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-use super::StaticContent;
 use rocket::response::NamedFile;
-use rocket::State;
 
 #[get("/")]
-fn index(static_content: State<StaticContent>) -> io::Result<NamedFile> {
-    NamedFile::open(Path::new(&static_content.0).join("index.html"))
+fn index() -> io::Result<NamedFile> {
+    let mut path: PathBuf = PathBuf::from(
+        SETTINGS
+            .read()
+            .expect("config file lock violation")
+            .get_str("static_content")
+            .unwrap(),
+    );
+    path.push("index.html");
+    NamedFile::open(path)
 }
 
 #[get("/main.js")]
-fn files(static_content: State<StaticContent>) -> io::Result<NamedFile> {
-    NamedFile::open(Path::new(&static_content.0).join("main.js"))
+fn files() -> io::Result<NamedFile> {
+    let mut path: PathBuf = PathBuf::from(
+        SETTINGS
+            .read()
+            .expect("config file lock violation")
+            .get_str("static_content")
+            .unwrap(),
+    );
+    path.push("main.js");
+    NamedFile::open(path)
 }
 
 #[get("/api/<path..>")]

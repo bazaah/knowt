@@ -1,5 +1,5 @@
 use proc::yaml_deposit;
-use serde_json::Value as JsonValue; // simple alias for serde_json::Value\
+use serde_json::Value as JsonValue; // simple alias for serde_json::Value
 use settings::SETTINGS;
 use std::fs;
 use std::fs::File;
