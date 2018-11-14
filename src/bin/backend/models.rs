@@ -16,13 +16,11 @@ type Result<T> = result::Result<T, ::failure::Error>;
 // which is set in SETTINGS as 'path'
 // It returns a Result of JsonValue which is a serde provided struct that is easy to convert to/from json; or an error
 pub fn show(path: PathBuf) -> Result<JsonValue> {
-    let mut pathbuf = PathBuf::from(
-        SETTINGS
-            .read()
-            .expect("config file lock violation")
-            .get_str("path")?,
-    ); // Finding the file directory root
-    pathbuf.push(path); // Adding the relative path passed to the function, to the root path
+    let source = PathBuf::from(SETTINGS.read().unwrap().get_root()); // Finding the file directory root
+
+    let mut pathbuf = source.clone();
+    pathbuf.push(path);
+
     let file = File::open(pathbuf)?;
     let data: JsonValue = ::serde_yaml::from_reader(file)?;
     Ok(data)
@@ -33,16 +31,14 @@ pub fn show(path: PathBuf) -> Result<JsonValue> {
 // path is the relative path from the SETTINGS defined root
 // It returns nothing; or an error
 pub fn create(file: JsonValue, path: PathBuf) -> Result<()> {
-    let mut path_buf = PathBuf::from(
-        SETTINGS
-            .read()
-            .expect("config file lock violation")
-            .get_str("path")?,
-    ); //Finding the file directory root
+    let source = PathBuf::from(SETTINGS.read().unwrap().get_root()); //Finding the file directory root
+
+    let mut path_buf = source.clone();
     path_buf.push(path);
+
     fs::create_dir_all(path_buf.parent().unwrap())?; // Unwrap cannot fail, either the directory exists/is created or create_dir_all will return an error
     let new_file = ::serde_yaml::to_string(&file)?;
-    yaml_deposit(new_file, path_buf);
+    yaml_deposit(new_file, &path_buf);
     Ok(())
 }
 
@@ -52,13 +48,11 @@ pub fn create(file: JsonValue, path: PathBuf) -> Result<()> {
 // key being the key to the value that is being updated
 // It returns nothing; or an error
 pub fn update_data(content_update: JsonValue, key: String, path: PathBuf) -> Result<JsonValue> {
-    let mut path_buf = PathBuf::from(
-        SETTINGS
-            .read()
-            .expect("config file lock violation")
-            .get_str("path")?,
-    ); //Finding the file directory root
+    let source = PathBuf::from(SETTINGS.read().unwrap().get_root()); //Finding the file directory root
+
+    let mut path_buf = source.clone();
     path_buf.push(path);
+
     let file = File::open(&path_buf)?;
     let k = key.as_str(); // Takes a &str slice of key
     let update = json!({ k: content_update });
@@ -67,7 +61,7 @@ pub fn update_data(content_update: JsonValue, key: String, path: PathBuf) -> Res
     if yaml_file.get(k).is_some() && update.get(k).is_some() {
         *yaml_file.get_mut(k).unwrap() = update.get(k).unwrap().to_owned(); // Unwrap(s) cannot fail due to the above check
         let yaml_str = ::serde_yaml::to_string(&yaml_file)?;
-        yaml_deposit(yaml_str, path_buf);
+        yaml_deposit(yaml_str, &path_buf);
     }
     Ok(yaml_file)
 }
@@ -108,15 +102,10 @@ pub fn dir_tree() -> Option<Vec<JsonValue>> {
             .unwrap_or(false)
     }
 
-    let path_buf = PathBuf::from(
-        SETTINGS
-            .read()
-            .expect("config file lock violation")
-            .get_str("path")
-            .unwrap(),
-    ); //Finding the file directory root
+    let path_buf = PathBuf::from(SETTINGS.read().unwrap().get_root()); //Finding the file directory root
     let walker = WalkDir::new(path_buf.as_path()).into_iter();
     let mut vec = Vec::new();
+
     // Filters out hidden
     for entry in walker.filter_entry(|e| !is_hidden(e)) {
         // Unsure if this can fail, needs more testing

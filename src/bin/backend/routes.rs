@@ -9,26 +9,16 @@ use rocket::response::NamedFile;
 
 #[get("/")]
 fn index() -> io::Result<NamedFile> {
-    let mut path: PathBuf = PathBuf::from(
-        SETTINGS
-            .read()
-            .expect("config file lock violation")
-            .get_str("static_content")
-            .unwrap(),
-    );
+    let source = PathBuf::from(SETTINGS.read().unwrap().get_static_content());
+    let mut path = source.clone();
     path.push("index.html");
     NamedFile::open(path)
 }
 
 #[get("/main.js")]
 fn files() -> io::Result<NamedFile> {
-    let mut path: PathBuf = PathBuf::from(
-        SETTINGS
-            .read()
-            .expect("config file lock violation")
-            .get_str("static_content")
-            .unwrap(),
-    );
+    let source = PathBuf::from(SETTINGS.read().unwrap().get_static_content());
+    let mut path = source.clone();
     path.push("main.js");
     NamedFile::open(path)
 }

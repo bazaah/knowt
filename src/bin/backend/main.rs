@@ -9,10 +9,10 @@ extern crate lazy_static;
 extern crate serde_yaml;
 #[macro_use]
 extern crate serde_json;
-//#[macro_use]
+#[macro_use]
+extern crate clap;
 extern crate failure;
 extern crate walkdir;
-
 // Imports routes for rocket and the function to initialize the config
 use routes::*;
 use settings::*;
@@ -24,7 +24,9 @@ mod routes;
 mod settings;
 
 fn main() {
-    ini_config().unwrap();
+    // Initialize clap and route config details to SETTINGS
+    init_clap();
+
     rocket::ignite()
         .mount("/", routes![new, view, update, file_tree, index, files])
         .launch();
