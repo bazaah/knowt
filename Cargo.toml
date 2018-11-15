@@ -1,6 +1,6 @@
 [package]
 name = "knowt"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Baz <github(a)luxolus.com>"]
 
 [dependencies]
