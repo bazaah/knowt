@@ -36,6 +36,9 @@ body {
 .flex_content > div {
   width: 85%;
 }
+.flex_content > div pre {
+  overflow: auto;
+}
 
 @media (min-width: 699px) {
   .header {
