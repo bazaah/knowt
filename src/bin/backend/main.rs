@@ -25,9 +25,13 @@ mod settings;
 
 fn main() {
     // Initialize clap and route config details to SETTINGS
-    init_clap();
+    let init = init_clap();
 
-    rocket::ignite()
+    let rocket = match init {
+        Some(config) => rocket::custom(config, true),
+        None => rocket::ignite(),
+    };
+    rocket
         .mount("/", routes![new, view, update, file_tree, index, files])
         .launch();
 }
