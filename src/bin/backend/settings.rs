@@ -1,6 +1,6 @@
 use clap::{App, Arg, SubCommand};
 use config::{Config as FileConfig, File};
-use rocket::config::{Config, Environment};
+use rocket::config::{Config, LoggingLevel};
 use std::path::PathBuf;
 use std::sync::RwLock;
 
@@ -54,24 +54,128 @@ pub fn init_clap() -> Option<Config> {
             SubCommand::with_name("rocket")
                 .about("Controls Rocket configuration")
                 .arg(
-                    Arg::with_name("env")
-                        .short("E")
-                        .long("env")
+                    Arg::with_name("Base")
+                        .display_order(1)
+                        .short("B")
+                        .long("base")
+                        .value_name("defaults")
                         .takes_value(true)
-                        .possible_values(&["dev", "stage", "prod"]),
+                        .required(true)
+                        .possible_values(&["dev", "stage", "prod"])
+                        .help("Set your basic configuration environment"),
+                )
+                .arg(
+                    Arg::with_name("address")
+                        .requires("Base")
+                        .short("a")
+                        .long("address")
+                        .value_name("IP / host")
+                        .takes_value(true)
+                        .help("Set host address"),
+                )
+                .arg(
+                    Arg::with_name("port")
+                        .requires("Base")
+                        .short("p")
+                        .long("port")
+                        .value_name("port")
+                        .takes_value(true)
+                        .help("Set server port")
+                        .validator(|input| -> Result<(), String> {
+                            let convert = input.parse::<u16>();
+                            if convert.is_ok() {
+                                return Ok(());
+                            } else {
+                                return Err(String::from("The value is not valid u16"));
+                            }
+                        }),
+                )
+                .arg(
+                    Arg::with_name("log_level")
+                        .requires("Base")
+                        .short("l")
+                        .long("log")
+                        .value_name("level")
+                        .takes_value(true)
+                        .possible_values(&["critical", "normal", "debug"])
+                        .help("Set logging level"),
+                )
+                .arg(
+                    Arg::with_name("workers")
+                        .requires("Base")
+                        .short("w")
+                        .long("workers")
+                        .value_name("threads")
+                        .takes_value(true)
+                        .help(
+                            "Only manually set this if you know what you're doing. Default: [# of CPUs * 2]",
+                        )
+                        .validator(|input| -> Result<(), String> {
+                            let convert = input.parse::<u16>();
+                            if convert.is_ok() {
+                                return Ok(());
+                            } else {
+                                return Err(String::from("The value is not valid u16"));
+                            }
+                        }),
                 ),
         )
         .get_matches();
 
-    let mut application: Option<Config> = None;
+    let mut settings: Option<Config> = None;
     if let Some(rocket) = matches.subcommand_matches("rocket") {
-        if rocket.is_present("env") {
-            match rocket.value_of("env") {
-                Some("dev") => application = Some(Config::development().expect("Bad CWD")),
-                Some("stage") => application = Some(Config::staging().expect("Bad CWD")),
-                Some("prod") => application = Some(Config::production().expect("Bad CWD")),
-                None => println!("Whoopsie"),
-                _ => println!("The great void beckons"),
+        if rocket.is_present("Base") {
+            match rocket.value_of("Base") {
+                Some("dev") => settings = Some(Config::development().expect("Bad CWD")),
+                Some("stage") => settings = Some(Config::staging().expect("Bad CWD")),
+                Some("prod") => settings = Some(Config::production().expect("Bad CWD")),
+                None => (),
+                _ => (),
+            }
+
+            match rocket.value_of("address") {
+                Some(host) => match settings.as_mut() {
+                    Some(settings) => settings.set_address(host).unwrap(),
+                    None => (),
+                },
+                None => (),
+            }
+
+            match rocket.value_of("port") {
+                Some(port) => match settings.as_mut() {
+                    Some(settings) => {
+                        settings.set_port(std::str::FromStr::from_str(&port).unwrap())
+                    }
+                    None => (),
+                },
+                None => (),
+            }
+
+            match rocket.value_of("log_level") {
+                Some("critical") => match settings.as_mut() {
+                    Some(settings) => settings.set_log_level(LoggingLevel::Critical),
+                    None => (),
+                },
+                Some("normal") => match settings.as_mut() {
+                    Some(settings) => settings.set_log_level(LoggingLevel::Normal),
+                    None => (),
+                },
+                Some("debug") => match settings.as_mut() {
+                    Some(settings) => settings.set_log_level(LoggingLevel::Debug),
+                    None => (),
+                },
+                None => (),
+                _ => (),
+            }
+
+            match rocket.value_of("workers") {
+                Some(workers) => match settings.as_mut() {
+                    Some(settings) => {
+                        settings.set_port(std::str::FromStr::from_str(&workers).unwrap())
+                    }
+                    None => (),
+                },
+                None => (),
             }
         }
     }
@@ -89,5 +193,5 @@ pub fn init_clap() -> Option<Config> {
     SETTINGS.write().unwrap().set_server_root(srv_root);
     SETTINGS.write().unwrap().set_static_content(stc_cnt);
 
-    return application;
+    return settings;
 }
