@@ -1,31 +1,32 @@
 use super::models::*;
+use rocket::response::NamedFile;
+use rocket::State;
 use rocket_contrib::Json;
 use serde_json::Value as JsonValue;
-use settings::SETTINGS;
+use settings::ExtraConfig;
 use std::io;
 use std::path::PathBuf;
 
-use rocket::response::NamedFile;
-
 #[get("/")]
-fn index() -> io::Result<NamedFile> {
-    let source = PathBuf::from(SETTINGS.read().unwrap().get_static_content());
-    let mut path = source.clone();
+fn index(config: State<ExtraConfig>) -> io::Result<NamedFile> {
+    let mut path = PathBuf::from(&config.get_static_content());
     path.push("index.html");
     NamedFile::open(path)
 }
 
 #[get("/main.js")]
-fn files() -> io::Result<NamedFile> {
-    let source = PathBuf::from(SETTINGS.read().unwrap().get_static_content());
-    let mut path = source.clone();
+fn files(config: State<ExtraConfig>) -> io::Result<NamedFile> {
+    let mut path = PathBuf::from(&config.get_static_content());
     path.push("main.js");
     NamedFile::open(path)
 }
 
 #[get("/api/<path..>")]
-fn view(path: PathBuf) -> Json<JsonValue> {
-    let file = match show(path) {
+fn view(config: State<ExtraConfig>, path: PathBuf) -> Json<JsonValue> {
+    let mut full_path = PathBuf::from(&config.get_root());
+    full_path.push(path);
+
+    let file = match show(full_path) {
         Ok(res) => Json(json!({"status": 200, "result": res})),
         Err(e) => Json(json!({"status": 500, "result": formated_error(&e)}
         )),
@@ -38,8 +39,11 @@ fn view(path: PathBuf) -> Json<JsonValue> {
     format = "application/json",
     data = "<file>"
 )]
-pub fn new(file: Json<JsonValue>, path: PathBuf) -> Json<JsonValue> {
-    let status = match create(file.into_inner(), path) {
+pub fn new(config: State<ExtraConfig>, file: Json<JsonValue>, path: PathBuf) -> Json<JsonValue> {
+    let mut full_path = PathBuf::from(&config.get_root());
+    full_path.push(path);
+
+    let status = match create(file.into_inner(), full_path) {
         Ok(()) => Json(json!({"status": 200})),
         Err(e) => Json(json!({"status": 500, "result": formated_error(&e)}
         )),
@@ -52,8 +56,16 @@ pub fn new(file: Json<JsonValue>, path: PathBuf) -> Json<JsonValue> {
     format = "application/json",
     data = "<data>"
 )]
-pub fn update(data: Json<JsonValue>, key: String, path: PathBuf) -> Json<JsonValue> {
-    let updated_data = match update_data(data.into_inner(), key, path) {
+pub fn update(
+    config: State<ExtraConfig>,
+    data: Json<JsonValue>,
+    key: String,
+    path: PathBuf,
+) -> Json<JsonValue> {
+    let mut full_path = PathBuf::from(&config.get_root());
+    full_path.push(path);
+
+    let updated_data = match update_data(data.into_inner(), key, full_path) {
         Ok(res) => Json(json!({"status": 200, "result": res})),
         Err(e) => Json(json!({"status": 500, "result": formated_error(&e)}
         )),
@@ -62,8 +74,10 @@ pub fn update(data: Json<JsonValue>, key: String, path: PathBuf) -> Json<JsonVal
 }
 
 #[get("/api/dir")]
-pub fn file_tree() -> Json<JsonValue> {
-    let status = match dir_tree() {
+pub fn file_tree(config: State<ExtraConfig>) -> Json<JsonValue> {
+    let path = PathBuf::from(&config.get_root());
+
+    let status = match dir_tree(path) {
         Some(res) => Json(json!({"status": 200, "result": res})),
         None => Json(json!({"status": 500, "result": "file directory not found"})),
     };

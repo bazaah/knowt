@@ -1,6 +1,5 @@
 use proc::yaml_deposit;
 use serde_json::Value as JsonValue; // simple alias for serde_json::Value
-use settings::SETTINGS;
 use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
@@ -12,48 +11,26 @@ use walkdir::{DirEntry, WalkDir};
 type Result<T> = result::Result<T, ::failure::Error>;
 
 // Main function for converting a yaml file into a json string
-// Takes one variable which is the path to the file, relative to the root directory
-// which is set in SETTINGS as 'path'
 // It returns a Result of JsonValue which is a serde provided struct that is easy to convert to/from json; or an error
 pub fn show(path: PathBuf) -> Result<JsonValue> {
-    let source = PathBuf::from(SETTINGS.read().unwrap().get_root()); // Finding the file directory root
-
-    let mut pathbuf = source.clone();
-    pathbuf.push(path);
-
-    let file = File::open(pathbuf)?;
+    let file = File::open(path)?;
     let data: JsonValue = ::serde_yaml::from_reader(file)?;
     Ok(data)
 }
 
 // Main function for creating new yaml files
-// Takes two variables: file and path, file is a JsonValue that contains valid json,
-// path is the relative path from the SETTINGS defined root
 // It returns nothing; or an error
 pub fn create(file: JsonValue, path: PathBuf) -> Result<()> {
-    let source = PathBuf::from(SETTINGS.read().unwrap().get_root()); //Finding the file directory root
-
-    let mut path_buf = source.clone();
-    path_buf.push(path);
-
-    fs::create_dir_all(path_buf.parent().unwrap())?; // Unwrap cannot fail, either the directory exists/is created or create_dir_all will return an error
+    fs::create_dir_all(path.parent().unwrap())?; // Unwrap cannot fail, either the directory exists/is created or create_dir_all will return an error
     let new_file = ::serde_yaml::to_string(&file)?;
-    yaml_deposit(new_file, &path_buf);
+    yaml_deposit(new_file, &path);
     Ok(())
 }
 
 // Main function for updating data in existing yaml files
-// Takes three variables: update, key, path; update is a JsonValue that contains valid json
-// path is the relative path from the SETTINGS defined root
-// key being the key to the value that is being updated
 // It returns nothing; or an error
 pub fn update_data(content_update: JsonValue, key: String, path: PathBuf) -> Result<JsonValue> {
-    let source = PathBuf::from(SETTINGS.read().unwrap().get_root()); //Finding the file directory root
-
-    let mut path_buf = source.clone();
-    path_buf.push(path);
-
-    let file = File::open(&path_buf)?;
+    let file = File::open(&path)?;
     let k = key.as_str(); // Takes a &str slice of key
     let update = json!({ k: content_update });
     let mut yaml_file: JsonValue = ::serde_yaml::from_reader(&file)?;
@@ -61,7 +38,7 @@ pub fn update_data(content_update: JsonValue, key: String, path: PathBuf) -> Res
     if yaml_file.get(k).is_some() && update.get(k).is_some() {
         *yaml_file.get_mut(k).unwrap() = update.get(k).unwrap().to_owned(); // Unwrap(s) cannot fail due to the above check
         let yaml_str = ::serde_yaml::to_string(&yaml_file)?;
-        yaml_deposit(yaml_str, &path_buf);
+        yaml_deposit(yaml_str, &path);
     }
     Ok(yaml_file)
 }
@@ -82,9 +59,8 @@ pub fn formated_error(err: &::failure::Error) -> String {
 }
 
 // Main function for directory tree discovery
-// Takes no variables, returns an Option of a vector filled with JsonValues
 // It skips hidden folders/files and any path that does not end in a .yaml extension
-pub fn dir_tree() -> Option<Vec<JsonValue>> {
+pub fn dir_tree(path: PathBuf) -> Option<Vec<JsonValue>> {
     // Helper function for skipping hidden paths
     fn is_hidden(entry: &DirEntry) -> bool {
         entry
@@ -102,8 +78,7 @@ pub fn dir_tree() -> Option<Vec<JsonValue>> {
             .unwrap_or(false)
     }
 
-    let path_buf = PathBuf::from(SETTINGS.read().unwrap().get_root()); //Finding the file directory root
-    let walker = WalkDir::new(path_buf.as_path()).into_iter();
+    let walker = WalkDir::new(path.as_path()).into_iter();
     let mut vec = Vec::new();
 
     // Filters out hidden

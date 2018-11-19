@@ -1,44 +1,30 @@
 use clap::{App, Arg, SubCommand};
-use config::{Config as FileConfig, File};
-use rocket::config::{Config, LoggingLevel};
-use std::path::PathBuf;
-use std::sync::RwLock;
+use rocket::config::{Config, LoggingLevel, Value};
+use std::collections::HashMap;
 
-lazy_static! {
-    pub static ref SETTINGS: RwLock<Settings> = RwLock::new(Settings::new());
+pub struct ExtraConfig {
+    content_root: String,
+    static_content: String,
 }
 
-pub struct Settings {
-    server_root: PathBuf,
-    static_content: PathBuf,
-}
-
-impl Settings {
-    fn new() -> Settings {
-        Settings {
-            server_root: PathBuf::new(),
-            static_content: PathBuf::new(),
+impl ExtraConfig {
+    pub fn new(sc: String, cr: String) -> ExtraConfig {
+        ExtraConfig {
+            static_content: sc,
+            content_root: cr,
         }
     }
 
-    fn set_server_root(&mut self, root: PathBuf) {
-        self.server_root.push(root);
+    pub fn get_static_content(&self) -> String {
+        self.static_content.clone()
     }
 
-    fn set_static_content(&mut self, content_path: PathBuf) {
-        self.static_content.push(content_path);
-    }
-
-    pub fn get_root(&self) -> &PathBuf {
-        &self.server_root
-    }
-
-    pub fn get_static_content(&self) -> &PathBuf {
-        &self.static_content
+    pub fn get_root(&self) -> String {
+        self.content_root.clone()
     }
 }
 
-pub fn init_clap() -> Option<Config> {
+pub fn initialization() -> Option<Config> {
     let matches = App::new("Knowt")
         .about("Knowt Alpha")
         .author(crate_authors!("\n"))
@@ -86,7 +72,7 @@ pub fn init_clap() -> Option<Config> {
                             if convert.is_ok() {
                                 return Ok(());
                             } else {
-                                return Err(String::from("The value is not valid u16"));
+                                return Err(String::from("The input is not valid u16"));
                             }
                         }),
                 )
@@ -115,9 +101,27 @@ pub fn init_clap() -> Option<Config> {
                             if convert.is_ok() {
                                 return Ok(());
                             } else {
-                                return Err(String::from("The value is not valid u16"));
+                                return Err(String::from("The input is not valid u16"));
                             }
                         }),
+                )
+                .arg(
+                    Arg::with_name("content_root")
+                        .requires("Base")
+                        .short("cr")
+                        .long("root")
+                        .value_name("PATH")
+                        .takes_value(true)
+                        .help("Set path to content root directory")
+                )
+                .arg(
+                    Arg::with_name("static_content")
+                        .requires("Base")
+                        .short("sc")
+                        .long("static")
+                        .value_name("PATH")
+                        .takes_value(true)
+                        .help("Set path to static content directory")
                 ),
         )
         .get_matches();
@@ -177,21 +181,23 @@ pub fn init_clap() -> Option<Config> {
                 },
                 None => (),
             }
+
+            let mut extras: HashMap<String, Value> = HashMap::new();
+            extras.insert(
+                "path".to_string(),
+                rocket.value_of("content_root").unwrap_or("example/").into(),
+            );
+            extras.insert(
+                "static_content".to_string(),
+                rocket.value_of("static_content").unwrap_or("dist/").into(),
+            );
+
+            match settings.as_mut() {
+                Some(settings) => settings.set_extras(extras),
+                None => (),
+            }
         }
     }
-
-    /* --- */
-    let config_path = matches
-        .value_of("config")
-        .unwrap_or("example/config/settings");
-    let mut config_file = FileConfig::new();
-    config_file.merge(File::with_name(config_path)).unwrap();
-
-    let srv_root = PathBuf::from(config_file.get_str("path").unwrap());
-    let stc_cnt = PathBuf::from(config_file.get_str("static_content").unwrap());
-
-    SETTINGS.write().unwrap().set_server_root(srv_root);
-    SETTINGS.write().unwrap().set_static_content(stc_cnt);
 
     return settings;
 }

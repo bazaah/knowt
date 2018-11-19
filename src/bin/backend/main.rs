@@ -4,7 +4,7 @@
 extern crate config;
 extern crate rocket;
 extern crate rocket_contrib;
-#[macro_use]
+//#[macro_use]
 extern crate lazy_static;
 extern crate serde_yaml;
 #[macro_use]
@@ -13,8 +13,12 @@ extern crate serde_json;
 extern crate clap;
 extern crate failure;
 extern crate walkdir;
+
+use rocket::fairing::AdHoc;
+
 // Imports routes for rocket and the function to initialize the config
 use routes::*;
+use settings::ExtraConfig;
 use settings::*;
 
 // Ties modules to main.rs
@@ -24,8 +28,8 @@ mod routes;
 mod settings;
 
 fn main() {
-    // Initialize clap and route config details to SETTINGS
-    let init = init_clap();
+    // Initialize rocket with clap
+    let init = initialization();
 
     let rocket = match init {
         Some(config) => rocket::custom(config, true),
@@ -33,5 +37,20 @@ fn main() {
     };
     rocket
         .mount("/", routes![new, view, update, file_tree, index, files])
+        .attach(AdHoc::on_attach(|rocket| {
+            let root = rocket
+                .config()
+                .get_str("path")
+                .unwrap_or("example/")
+                .to_string();
+            let static_content = rocket
+                .config()
+                .get_str("static_content")
+                .unwrap_or("dist/")
+                .to_string();
+            let settings: ExtraConfig = settings::ExtraConfig::new(static_content, root);
+
+            Ok(rocket.manage(settings))
+        }))
         .launch();
 }
