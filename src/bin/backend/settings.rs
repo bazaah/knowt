@@ -70,9 +70,9 @@ pub fn initialization() -> Option<Config> {
                         .validator(|input| -> Result<(), String> {
                             let convert = input.parse::<u16>();
                             if convert.is_ok() {
-                                return Ok(());
+                                Ok(())
                             } else {
-                                return Err(String::from("The input is not valid u16"));
+                                Err(String::from("The input is not valid u16"))
                             }
                         }),
                 )
@@ -99,9 +99,9 @@ pub fn initialization() -> Option<Config> {
                         .validator(|input| -> Result<(), String> {
                             let convert = input.parse::<u16>();
                             if convert.is_ok() {
-                                return Ok(());
+                                Ok(())
                             } else {
-                                return Err(String::from("The input is not valid u16"));
+                                Err(String::from("The input is not valid u16"))
                             }
                         }),
                 )
@@ -138,47 +138,49 @@ pub fn initialization() -> Option<Config> {
             }
 
             match rocket.value_of("address") {
-                Some(host) => match settings.as_mut() {
-                    Some(settings) => settings.set_address(host).unwrap(),
-                    None => (),
-                },
+                Some(host) => {
+                    if let Some(settings) = settings.as_mut() {
+                        settings.set_address(host).unwrap()
+                    }
+                }
                 None => (),
             }
 
             match rocket.value_of("port") {
-                Some(port) => match settings.as_mut() {
-                    Some(settings) => {
+                Some(port) => {
+                    if let Some(settings) = settings.as_mut() {
                         settings.set_port(std::str::FromStr::from_str(&port).unwrap())
                     }
-                    None => (),
-                },
+                }
                 None => (),
             }
 
             match rocket.value_of("log_level") {
-                Some("critical") => match settings.as_mut() {
-                    Some(settings) => settings.set_log_level(LoggingLevel::Critical),
-                    None => (),
-                },
-                Some("normal") => match settings.as_mut() {
-                    Some(settings) => settings.set_log_level(LoggingLevel::Normal),
-                    None => (),
-                },
-                Some("debug") => match settings.as_mut() {
-                    Some(settings) => settings.set_log_level(LoggingLevel::Debug),
-                    None => (),
-                },
+                Some("critical") => {
+                    if let Some(settings) = settings.as_mut() {
+                        settings.set_log_level(LoggingLevel::Critical)
+                    }
+                }
+                Some("normal") => {
+                    if let Some(settings) = settings.as_mut() {
+                        settings.set_log_level(LoggingLevel::Normal)
+                    }
+                }
+                Some("debug") => {
+                    if let Some(settings) = settings.as_mut() {
+                        settings.set_log_level(LoggingLevel::Debug)
+                    }
+                }
                 None => (),
                 _ => (),
             }
 
             match rocket.value_of("workers") {
-                Some(workers) => match settings.as_mut() {
-                    Some(settings) => {
+                Some(workers) => {
+                    if let Some(settings) = settings.as_mut() {
                         settings.set_port(std::str::FromStr::from_str(&workers).unwrap())
                     }
-                    None => (),
-                },
+                }
                 None => (),
             }
 
@@ -192,12 +194,11 @@ pub fn initialization() -> Option<Config> {
                 rocket.value_of("static_content").unwrap_or("dist/").into(),
             );
 
-            match settings.as_mut() {
-                Some(settings) => settings.set_extras(extras),
-                None => (),
+            if let Some(settings) = settings.as_mut() {
+                settings.set_extras(extras)
             }
         }
     }
 
-    return settings;
+    settings
 }

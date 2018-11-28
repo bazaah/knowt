@@ -20,7 +20,7 @@ pub fn show(path: PathBuf) -> Result<JsonValue> {
 
 // Main function for creating new yaml files
 // It returns nothing; or an error
-pub fn create(file: JsonValue, path: PathBuf) -> Result<()> {
+pub fn create(file: &JsonValue, path: &PathBuf) -> Result<()> {
     fs::create_dir_all(path.parent().unwrap())?; // Unwrap cannot fail, either the directory exists/is created or create_dir_all will return an error
     let new_file = ::serde_yaml::to_string(&file)?;
     yaml_deposit(new_file, &path);
@@ -29,7 +29,7 @@ pub fn create(file: JsonValue, path: PathBuf) -> Result<()> {
 
 // Main function for updating data in existing yaml files
 // It returns nothing; or an error
-pub fn update_data(content_update: JsonValue, key: String, path: PathBuf) -> Result<JsonValue> {
+pub fn update_data(content_update: &JsonValue, key: String, path: &PathBuf) -> Result<JsonValue> {
     let file = File::open(&path)?;
     let k = key.as_str(); // Takes a &str slice of key
     let update = json!({ k: content_update });
@@ -60,13 +60,13 @@ pub fn formated_error(err: &::failure::Error) -> String {
 
 // Main function for directory tree discovery
 // It skips hidden folders/files and any path that does not end in a .yaml extension
-pub fn dir_tree(path: PathBuf) -> Option<Vec<JsonValue>> {
+pub fn dir_tree(path: &PathBuf) -> Option<Vec<JsonValue>> {
     // Helper function for skipping hidden paths
     fn is_hidden(entry: &DirEntry) -> bool {
         entry
             .file_name()
             .to_str()
-            .map(|s| s.starts_with("."))
+            .map(|s| s.starts_with('.'))
             .unwrap_or(false)
     }
     //Helper function for skipping non .yaml paths
@@ -88,7 +88,7 @@ pub fn dir_tree(path: PathBuf) -> Option<Vec<JsonValue>> {
         // Further filtering to ensure only paths that terminate in a yaml file are processed
         if entry.path().is_file() && is_yaml(&entry) {
             let file_name = entry.path().file_name()?.to_str()?;
-            let mut split_path: Vec<&str> = entry.path().parent()?.to_str()?.split("/").collect();
+            let mut split_path: Vec<&str> = entry.path().parent()?.to_str()?.split('/').collect();
             vec.push(json!({"path": split_path, "name": file_name, "parent": split_path.pop()?})); // Data for populating initial frontend state
         };
     }

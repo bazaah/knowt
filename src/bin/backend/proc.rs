@@ -15,7 +15,7 @@ pub fn yaml_deposit(file: String, path: &PathBuf) {
     };
 
     match proc_deposit.stdin.unwrap().write_all(file.as_bytes()) {
-        Ok(_) => (()),
+        Ok(_) => (),
         Err(why) => panic!("deposit write failed: {}", why.description()),
     };
 }

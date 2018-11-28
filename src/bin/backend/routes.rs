@@ -26,36 +26,26 @@ fn view(config: State<ExtraConfig>, path: PathBuf) -> Json<JsonValue> {
     let mut full_path = PathBuf::from(&config.get_root());
     full_path.push(path);
 
-    let file = match show(full_path) {
+    match show(full_path) {
         Ok(res) => Json(json!({"status": 200, "result": res})),
         Err(e) => Json(json!({"status": 500, "result": formated_error(&e)}
         )),
-    };
-    file
+    }
 }
 
-#[post(
-    "/api/<path..>",
-    format = "application/json",
-    data = "<file>"
-)]
+#[post("/api/<path..>", format = "application/json", data = "<file>")]
 pub fn new(config: State<ExtraConfig>, file: Json<JsonValue>, path: PathBuf) -> Json<JsonValue> {
     let mut full_path = PathBuf::from(&config.get_root());
     full_path.push(path);
 
-    let status = match create(file.into_inner(), full_path) {
+    match create(&file.into_inner(), &full_path) {
         Ok(()) => Json(json!({"status": 200})),
         Err(e) => Json(json!({"status": 500, "result": formated_error(&e)}
         )),
-    };
-    status
+    }
 }
 
-#[put(
-    "/api/<key>/<path..>",
-    format = "application/json",
-    data = "<data>"
-)]
+#[put("/api/<key>/<path..>", format = "application/json", data = "<data>")]
 pub fn update(
     config: State<ExtraConfig>,
     data: Json<JsonValue>,
@@ -65,21 +55,19 @@ pub fn update(
     let mut full_path = PathBuf::from(&config.get_root());
     full_path.push(path);
 
-    let updated_data = match update_data(data.into_inner(), key, full_path) {
+    match update_data(&data.into_inner(), key, &full_path) {
         Ok(res) => Json(json!({"status": 200, "result": res})),
         Err(e) => Json(json!({"status": 500, "result": formated_error(&e)}
         )),
-    };
-    updated_data
+    }
 }
 
 #[get("/api/dir")]
 pub fn file_tree(config: State<ExtraConfig>) -> Json<JsonValue> {
     let path = PathBuf::from(&config.get_root());
 
-    let status = match dir_tree(path) {
+    match dir_tree(&path) {
         Some(res) => Json(json!({"status": 200, "result": res})),
         None => Json(json!({"status": 500, "result": "file directory not found"})),
-    };
-    status
+    }
 }
