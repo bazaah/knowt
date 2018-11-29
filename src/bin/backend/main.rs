@@ -12,6 +12,7 @@ extern crate serde_json;
 #[macro_use]
 extern crate clap;
 extern crate failure;
+extern crate toml;
 extern crate walkdir;
 
 use rocket::fairing::AdHoc;
