@@ -1,6 +1,9 @@
 use clap::{App, Arg, SubCommand};
 use rocket::config::{Config, LoggingLevel, Value};
 use std::collections::HashMap;
+use std::fs;
+use std::path::Path;
+use toml::Value as TomlValue;
 
 pub struct ExtraConfig {
     content_root: String,
@@ -29,13 +32,6 @@ pub fn initialization() -> Option<Config> {
         .about("Knowt Alpha")
         .author(crate_authors!("\n"))
         .version(crate_version!())
-        .arg(
-            Arg::with_name("config")
-                .short("C")
-                .long("config")
-                .help("Set your custom config file")
-                .takes_value(true),
-        )
         .subcommand(
             SubCommand::with_name("rocket")
                 .about("Controls Rocket configuration")
@@ -49,6 +45,15 @@ pub fn initialization() -> Option<Config> {
                         .required(true)
                         .possible_values(&["dev", "stage", "prod"])
                         .help("Set your basic configuration environment"),
+                )
+                .arg(
+                    Arg::with_name("config")
+                        .requires("Base")
+                        .short("c")
+                        .long("config")
+                        .value_name("FILE")
+                        .help("Set your custom config file")
+                        .takes_value(true),
                 )
                 .arg(
                     Arg::with_name("address")
@@ -108,7 +113,6 @@ pub fn initialization() -> Option<Config> {
                 .arg(
                     Arg::with_name("content_root")
                         .requires("Base")
-                        .short("cr")
                         .long("root")
                         .value_name("PATH")
                         .takes_value(true)
@@ -117,7 +121,6 @@ pub fn initialization() -> Option<Config> {
                 .arg(
                     Arg::with_name("static_content")
                         .requires("Base")
-                        .short("sc")
                         .long("static")
                         .value_name("PATH")
                         .takes_value(true)
@@ -135,6 +138,86 @@ pub fn initialization() -> Option<Config> {
                 Some("prod") => settings = Some(Config::production().expect("Bad CWD")),
                 None => (),
                 _ => (),
+            }
+
+            if rocket.is_present("config") {
+                let path = Path::new(rocket.value_of("config").expect("Bad path"));
+                let config: TomlValue =
+                    toml::from_str(fs::read_to_string(path).expect("Bad File").as_str()).unwrap();
+                let environment = match rocket.value_of("Base") {
+                    Some("dev") => "development",
+                    Some("stage") => "staging",
+                    Some("prod") => "production",
+                    None => "",
+                    _ => "",
+                };
+
+                match config.get(environment) {
+                    Some(env) => {
+                        if let Some(address) = env.get("address") {
+                            if address.is_str() {
+                                if let Some(settings) = settings.as_mut() {
+                                    settings.set_address(address.as_str().unwrap()).unwrap()
+                                }
+                            }
+                        }
+
+                        if let Some(port) = env.get("port") {
+                            if port.is_integer() {
+                                if let Some(settings) = settings.as_mut() {
+                                    settings.set_port(port.as_integer().unwrap() as u16)
+                                }
+                            }
+                        }
+
+                        if let Some(log_level) = env.get("log") {
+                            if log_level.is_str() {
+                                match log_level.as_str() {
+                                    Some("critical") => {
+                                        if let Some(settings) = settings.as_mut() {
+                                            settings.set_log_level(LoggingLevel::Critical)
+                                        }
+                                    }
+                                    Some("normal") => {
+                                        if let Some(settings) = settings.as_mut() {
+                                            settings.set_log_level(LoggingLevel::Normal)
+                                        }
+                                    }
+                                    Some("debug") => {
+                                        if let Some(settings) = settings.as_mut() {
+                                            settings.set_log_level(LoggingLevel::Debug)
+                                        }
+                                    }
+                                    None => (),
+                                    _ => (),
+                                }
+                            }
+                        }
+
+                        let mut extras: HashMap<String, Value> = HashMap::new();
+                        if let Some(content_root) = env.get("path") {
+                            if content_root.is_str() {
+                                extras.insert(
+                                    "path".to_string(),
+                                    content_root.as_str().unwrap().into(),
+                                );
+                            }
+                        }
+
+                        if let Some(static_content) = env.get("static_content") {
+                            if static_content.is_str() {
+                                extras.insert(
+                                    "static_content".to_string(),
+                                    static_content.as_str().unwrap().into(),
+                                );
+                            }
+                        }
+                        if let Some(settings) = settings.as_mut() {
+                            settings.set_extras(extras)
+                        }
+                    }
+                    None => (),
+                }
             }
 
             match rocket.value_of("address") {
@@ -184,18 +267,21 @@ pub fn initialization() -> Option<Config> {
                 None => (),
             }
 
-            let mut extras: HashMap<String, Value> = HashMap::new();
-            extras.insert(
-                "path".to_string(),
-                rocket.value_of("content_root").unwrap_or("example/").into(),
-            );
-            extras.insert(
-                "static_content".to_string(),
-                rocket.value_of("static_content").unwrap_or("dist/").into(),
-            );
+            if rocket.is_present("content_root") || rocket.is_present("static_content") {
+                let mut extras: HashMap<String, Value> = HashMap::new();
 
-            if let Some(settings) = settings.as_mut() {
-                settings.set_extras(extras)
+                extras.insert(
+                    "path".to_string(),
+                    rocket.value_of("content_root").unwrap_or("example/").into(),
+                );
+                extras.insert(
+                    "static_content".to_string(),
+                    rocket.value_of("static_content").unwrap_or("dist/").into(),
+                );
+
+                if let Some(settings) = settings.as_mut() {
+                    settings.set_extras(extras)
+                }
             }
         }
     }
