@@ -32,6 +32,8 @@ fn main() {
     // Initialize rocket with clap
     let init = initialization();
 
+    // If any custom config options exist use those,
+    // otherwise use rocket defaults (Rocket.toml > ENV: development)
     let rocket = match init {
         Some(config) => rocket::custom(config, true),
         None => rocket::ignite(),
