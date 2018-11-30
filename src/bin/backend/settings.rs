@@ -5,6 +5,7 @@ use std::fs;
 use std::path::Path;
 use toml::Value as TomlValue;
 
+// Struct for extra variables knowt requires, beyond rockets'
 pub struct ExtraConfig {
     content_root: String,
     static_content: String,
@@ -27,6 +28,7 @@ impl ExtraConfig {
     }
 }
 
+// Config initialization via CLI or ENV
 pub fn initialization() -> Option<Config> {
     let matches = App::new("Knowt")
         .about("Knowt Alpha")
@@ -137,8 +139,13 @@ pub fn initialization() -> Option<Config> {
         )
         .get_matches();
 
+    // Empty Option, conditionally filled based user input
     let mut settings: Option<Config> = None;
+
+    // Handles user input from the follow sources: ENV values, CLI options, foreign Rocket TOML file
+    // Input is valued in this order: CLI > ENV > FILE
     if let Some(rocket) = matches.subcommand_matches("rocket") {
+        // A Base config struct is required for any other configuration
         if rocket.is_present("Base") {
             match rocket.value_of("Base") {
                 Some("dev") => settings = Some(Config::development().expect("Bad CWD")),
@@ -148,10 +155,12 @@ pub fn initialization() -> Option<Config> {
                 _ => (),
             }
 
+            // File
             if rocket.is_present("config") {
                 let path = Path::new(rocket.value_of("config").expect("Bad path"));
                 let config: TomlValue =
                     toml::from_str(fs::read_to_string(path).expect("Bad File").as_str()).unwrap();
+
                 let environment = match rocket.value_of("Base") {
                     Some("dev") => "development",
                     Some("stage") => "staging",
@@ -159,7 +168,6 @@ pub fn initialization() -> Option<Config> {
                     None => "",
                     _ => "",
                 };
-
                 match config.get(environment) {
                     Some(env) => {
                         if let Some(address) = env.get("address") {
@@ -228,6 +236,7 @@ pub fn initialization() -> Option<Config> {
                 }
             }
 
+            // CLI / ENV
             match rocket.value_of("address") {
                 Some(host) => {
                     if let Some(settings) = settings.as_mut() {
