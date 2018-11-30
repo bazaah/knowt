@@ -228,8 +228,10 @@ pub fn initialization() -> Option<Config> {
                                 );
                             }
                         }
-                        if let Some(settings) = settings.as_mut() {
-                            settings.set_extras(extras)
+                        if !extras.is_empty() {
+                            if let Some(settings) = settings.as_mut() {
+                                settings.set_extras(extras)
+                            }
                         }
                     }
                     None => (),
