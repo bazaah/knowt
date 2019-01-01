@@ -148,9 +148,9 @@ pub fn initialization() -> Option<Config> {
         // A Base config struct is required for any other configuration
         if rocket.is_present("Base") {
             match rocket.value_of("Base") {
-                Some("dev") => settings = Some(Config::development().expect("Bad CWD")),
-                Some("stage") => settings = Some(Config::staging().expect("Bad CWD")),
-                Some("prod") => settings = Some(Config::production().expect("Bad CWD")),
+                Some("dev") => settings = Some(Config::development()),
+                Some("stage") => settings = Some(Config::staging()),
+                Some("prod") => settings = Some(Config::production()),
                 None => (),
                 _ => (),
             }

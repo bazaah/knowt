@@ -1,28 +1,28 @@
 use super::models::*;
 use rocket::response::NamedFile;
 use rocket::State;
-use rocket_contrib::Json;
+use rocket_contrib::json::Json;
 use serde_json::Value as JsonValue;
-use settings::ExtraConfig;
+use crate::settings::ExtraConfig;
 use std::io;
 use std::path::PathBuf;
 
 #[get("/")]
-fn index(config: State<ExtraConfig>) -> io::Result<NamedFile> {
+pub fn index(config: State<ExtraConfig>) -> io::Result<NamedFile> {
     let mut path = PathBuf::from(&config.get_static_content());
     path.push("index.html");
     NamedFile::open(path)
 }
 
 #[get("/main.js")]
-fn files(config: State<ExtraConfig>) -> io::Result<NamedFile> {
+pub fn files(config: State<ExtraConfig>) -> io::Result<NamedFile> {
     let mut path = PathBuf::from(&config.get_static_content());
     path.push("main.js");
     NamedFile::open(path)
 }
 
 #[get("/api/<path..>")]
-fn view(config: State<ExtraConfig>, path: PathBuf) -> Json<JsonValue> {
+pub fn view(config: State<ExtraConfig>, path: PathBuf) -> Json<JsonValue> {
     let mut full_path = PathBuf::from(&config.get_root());
     full_path.push(path);
 
