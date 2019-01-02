@@ -6,7 +6,6 @@ import {
   showNewFileModal
 } from "../redux/actions/bansaActions";
 
-
 // Concourse for user manipulation of the bansa
 class Menubar extends React.Component {
   constructor(props) {
@@ -29,6 +28,7 @@ class Menubar extends React.Component {
       <div>
         <button onClick={() => this.onPress("MARKDOWN_VIEW")}>Markdown</button>
         <button onClick={() => this.onPress("EDITOR_VIEW")}>Editor</button>
+        <button onClick={() => this.onPress("TREE_VIEW")}>Viewer</button>
         <button onClick={() => this.handleOpenModal(true)}>New File</button>
       </div>
     );
@@ -38,7 +38,7 @@ class Menubar extends React.Component {
 Menubar.propTypes = {
   setBansaFilter: PropTypes.func.isRequired,
   showNewFileModal: PropTypes.func.isRequired
-}
+};
 
 //binds action creators to the indicated prop object
 function mapDispatchToProps(dispatch) {
