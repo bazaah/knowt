@@ -1,27 +1,17 @@
 #![feature(proc_macro_hygiene, decl_macro)]
-#![feature(uniform_paths)]
 
-extern crate config;
 #[macro_use]
 extern crate rocket;
-extern crate rocket_contrib;
-//#[macro_use]
-//extern crate lazy_static;
-extern crate serde_yaml;
 #[macro_use]
 extern crate serde_json;
 #[macro_use]
 extern crate clap;
-// extern crate failure;
-// extern crate toml;
-// extern crate walkdir;
-
-use rocket::fairing::AdHoc;
 
 // Imports routes for rocket and the function to initialize the config
-use routes::*;
-use settings::ExtraConfig;
-use settings::*;
+use crate::routes::*;
+use crate::settings::ExtraConfig;
+use crate::settings::*;
+use rocket::fairing::AdHoc;
 
 // Ties modules to main.rs
 mod models;
@@ -34,7 +24,7 @@ fn main() {
     let init = initialization();
 
     // If any custom config options exist use those,
-    // otherwise use rocket defaults (Rocket.toml > ENV: development)
+    // otherwise use rocket defaults (Rocket.toml => ENV: development)
     let rocket = match init {
         Some(config) => rocket::custom(config),
         None => rocket::ignite(),
