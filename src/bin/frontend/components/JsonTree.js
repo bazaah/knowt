@@ -5,7 +5,16 @@ import JsonViewer from "react-json-view";
 
 class JsonTree extends React.Component {
   render() {
-    return <JsonViewer src={this.props.file} />;
+    return (
+      <JsonViewer
+        src={this.props.file}
+        collapseStringsAfterLength={12}
+        name={false}
+        indentWidth={2}
+        displayDataTypes={false}
+        displayObjectSize={false}
+      />
+    );
   }
 }
 
