@@ -18,6 +18,7 @@ mod models;
 mod proc;
 mod routes;
 mod settings;
+mod parse;
 
 fn main() {
     // Initialize rocket with clap

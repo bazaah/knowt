@@ -1,9 +1,7 @@
+use crate::parse::JsonPacket;
 use crate::proc::yaml_deposit;
-use serde_json::Value as JsonValue; // simple alias for serde_json::Value
-use std::fs;
-use std::fs::File;
-use std::path::PathBuf;
-use std::result;
+use serde_json::Value as JsonValue;
+use std::{fs, fs::File, path::PathBuf, result};
 use walkdir::{DirEntry, WalkDir};
 
 //Alias for handling Results<Ok, Err> where Ok can be any type,
@@ -43,21 +41,6 @@ pub fn update_data(content_update: &JsonValue, key: String, path: &PathBuf) -> R
     Ok(yaml_file)
 }
 
-// Generic error handling for errors that users can fix
-// Simply creates a string of error(s) and associated cause(s)
-// In a human readable manner that is easy to convert to json
-// Takes one variable: err, which is a generic handle for any system / crate / module error
-pub fn formated_error(err: &::failure::Error) -> String {
-    let mut format = err.to_string();
-    let mut prev = err.as_fail();
-    while let Some(next) = prev.cause() {
-        format.push_str(": ");
-        format.push_str(&next.to_string());
-        prev = next;
-    }
-    format
-}
-
 // Main function for directory tree discovery
 // It skips hidden folders/files and any path that does not end in a .yaml extension
 pub fn dir_tree(path: &PathBuf) -> Option<Vec<JsonValue>> {
@@ -93,4 +76,25 @@ pub fn dir_tree(path: &PathBuf) -> Option<Vec<JsonValue>> {
         };
     }
     Some(vec)
+}
+
+// Generic error handling for errors that users can fix
+// Simply creates a string of error(s) and associated cause(s)
+// In a human readable manner that is easy to convert to json
+// Takes one variable: err, which is a generic handle for any system / crate / module error
+pub fn formated_error(err: &::failure::Error) -> String {
+    let mut format = err.to_string();
+    let mut prev = err.as_fail();
+    while let Some(next) = prev.cause() {
+        format.push_str(": ");
+        format.push_str(&next.to_string());
+        prev = next;
+    }
+    format
+}
+
+#[derive(FromForm)]
+pub struct PointerRequest {
+    file_path: String,
+    pointer_path: String,
 }

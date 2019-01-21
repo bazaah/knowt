@@ -1,7 +1,6 @@
 use super::models::*;
 use crate::settings::ExtraConfig;
-use rocket::response::NamedFile;
-use rocket::State;
+use rocket::{request::Form, response::NamedFile, State};
 use rocket_contrib::json::Json;
 use serde_json::Value as JsonValue;
 use std::io;
@@ -32,6 +31,9 @@ pub fn view(config: State<ExtraConfig>, path: PathBuf) -> Json<JsonValue> {
         )),
     }
 }
+
+#[get("/api/jpoint", data = "<field_pointer>")]
+pub fn jpointer(config: State<ExtraConfig>, field_pointer: Form<PointerRequest>) {}
 
 #[post("/api/<path..>", format = "application/json", data = "<file>")]
 pub fn new(config: State<ExtraConfig>, file: Json<JsonValue>, path: PathBuf) -> Json<JsonValue> {
