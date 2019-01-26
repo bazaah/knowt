@@ -15,10 +15,11 @@ use rocket::fairing::AdHoc;
 
 // Ties modules to main.rs
 mod models;
+mod parse;
 mod proc;
 mod routes;
 mod settings;
-mod parse;
+
 
 fn main() {
     // Initialize rocket with clap
@@ -31,7 +32,10 @@ fn main() {
         None => rocket::ignite(),
     };
     rocket
-        .mount("/", routes![new, view, update, file_tree, index, files])
+        .mount(
+            "/",
+            routes![new, view, view_field, update, file_tree, index, files],
+        )
         .attach(AdHoc::on_attach("Extra-Config", |rocket| {
             let root = rocket
                 .config()

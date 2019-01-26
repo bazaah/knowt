@@ -32,8 +32,18 @@ pub fn view(config: State<ExtraConfig>, path: PathBuf) -> Json<JsonValue> {
     }
 }
 
-#[get("/api/jpoint", data = "<field_pointer>")]
-pub fn jpointer(config: State<ExtraConfig>, field_pointer: Form<PointerRequest>) {}
+#[get("/api/vfield", data = "<request>")]
+pub fn view_field(config: State<ExtraConfig>, request: Form<PointerRequest>) -> Json<JsonValue> {
+    let request: PointerRequest = request.into_inner();
+    let (path, pointer) = request.take();
+    let mut full_path = PathBuf::from(&config.get_root());
+    full_path.push(path);
+
+    match show_pointer(full_path, pointer) {
+        Ok(res) => Json(json!({"status": 200, "result": res})),
+        Err(e) => Json(json!({"status": 500, "result": formated_error(&e)})),
+    }
+}
 
 #[post("/api/<path..>", format = "application/json", data = "<file>")]
 pub fn new(config: State<ExtraConfig>, file: Json<JsonValue>, path: PathBuf) -> Json<JsonValue> {
