@@ -1,12 +1,13 @@
 use crate::parse::JsonPacket;
 use crate::proc::yaml_deposit;
+use failure::{format_err, Error as fError};
 use serde_json::Value as JsonValue;
 use std::{fs, fs::File, path::PathBuf, result};
 use walkdir::{DirEntry, WalkDir};
 
 //Alias for handling Results<Ok, Err> where Ok can be any type,
 //and Err is set to failure::Error, except when explicitly defined otherwise
-type Result<T> = result::Result<T, ::failure::Error>;
+type Result<T> = result::Result<T, fError>;
 
 // Main function for converting a yaml file into a json string
 // It returns a Result of JsonValue which is a serde provided struct that is easy to convert to/from json; or an error
@@ -16,10 +17,17 @@ pub fn show(path: PathBuf) -> Result<JsonValue> {
     Ok(data)
 }
 
+pub fn show_pointer(path: PathBuf, pointer: String) -> Result<JsonValue> {
+    let file = File::open(path)?;
+    let data: JsonValue = serde_yaml::from_reader(file)?;
+    let result = data.pointer(&pointer);
+    result.cloned().ok_or(format_err!("Null"))
+}
+
 // Main function for creating new yaml files
 // It returns nothing; or an error
 pub fn create(file: &JsonValue, path: &PathBuf) -> Result<()> {
-    fs::create_dir_all(path.parent().unwrap())?; // Unwrap cannot fail, either the directory exists/is created or create_dir_all will return an error
+    fs::create_dir_all(path.parent().unwrap())?;
     let new_file = ::serde_yaml::to_string(&file)?;
     yaml_deposit(new_file, &path);
     Ok(())
@@ -98,3 +106,12 @@ pub struct PointerRequest {
     file_path: String,
     pointer_path: String,
 }
+
+impl PointerRequest {
+    pub fn take(self) -> (String, String) {
+        (self.file_path, self.pointer_path)
+    }
+}
+
+#[cfg(test)]
+mod tests;
