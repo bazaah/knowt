@@ -18,3 +18,6 @@ failure = "0.1.4"
 walkdir = "2.2.7"
 clap = "~2.32.0"
 toml = "0.4.10"
+
+[dev-dependencies]
+tempfile = "*"
