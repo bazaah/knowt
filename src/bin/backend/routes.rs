@@ -32,7 +32,7 @@ pub fn view(config: State<ExtraConfig>, path: PathBuf) -> Json<JsonValue> {
     }
 }
 
-#[get("/api/vfield", data = "<request>")]
+#[post("/api/vfield?<request..>")]
 pub fn view_field(config: State<ExtraConfig>, request: Form<PointerRequest>) -> Json<JsonValue> {
     let request: PointerRequest = request.into_inner();
     let (path, pointer) = request.take();
