@@ -1,6 +1,6 @@
 [package]
 name = "knowt"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Baz <github(a)luxolus.com>"]
 edition = "2018"
 
@@ -20,4 +20,4 @@ clap = "~2.32.0"
 toml = "0.4.10"
 
 [dev-dependencies]
-tempfile = "*"
+tempfile = "3.0.5"
