@@ -26,7 +26,7 @@ fn models_show() {
     let changed_after = after.pointer("/content").unwrap();
 
     assert_eq!(unchanged_before, unchanged_after);
-    assert_eq!(changed_after, "/content");
+    assert_eq!(changed_after, "{{/content}}");
 }
 
 #[test]
@@ -77,10 +77,10 @@ fn models_update_data() {
     let (_directory, path) = temp_io("update_test_file");
     let mut file = File::create(&path).expect("Failed to create temporary file...");
     file.write(data.as_slice()).expect("4");
-    let key = "aliceblue";
+    let pointer = "/aliceblue";
 
-    let update = update_data(&json, key.to_string(), &path).expect("2");
-    let result = update.pointer("/aliceblue").expect("3");
+    let update = update_data(&json, pointer, &path).expect("2");
+    let result = update.pointer(pointer).expect("3");
 
     assert_eq!(result, &json);
 }
