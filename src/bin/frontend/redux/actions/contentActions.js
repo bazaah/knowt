@@ -56,7 +56,12 @@ export function fetchContent(url) {
 // Async thunk meta action for requesting an update
 // for a given file, with given data
 // Returns a json object
-export function updateContent(url, updateData) {
+export function updateContent(path, pointer, updateData) {
+  const endpoint = "api/v1/update?";
+  let params = { file_path: path, pointer_path: pointer };
+  const query = new URLSearchParams(params);
+  let url = endpoint.concat(query);
+
   return dispatch => {
     dispatch(updateLoading(true));
     fetch(url, {
@@ -104,13 +109,15 @@ export function newContent(url, newFile) {
 }
 
 export function fetchElement(path, pointer) {
+  const endpoint = "api/v1/element?";
+  let params = { file_path: path, pointer_path: pointer };
+  const query = new URLSearchParams(params);
+  let url = endpoint.concat(query);
+
   return dispatch => {
-    const url = new URL("api/vfield", "http://172.17.17.223:8001");
-    let params = { file_path: path, pointer_path: pointer };
-    url.search = new URLSearchParams(params);
     dispatch(elementFetchLoading(true));
     fetch(url, {
-      method: "POST"
+      method: "GET"
     })
       .then(res => {
         if (res.status !== 200) {

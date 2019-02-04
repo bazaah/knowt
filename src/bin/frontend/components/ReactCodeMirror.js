@@ -34,8 +34,7 @@ class ReactCodeMirror extends React.Component {
   }
 
   handleBlur(data) {
-    const path = "api/content/".concat(this.props.workingFile);
-    this.props.updateContent(path, data);
+    this.props.updateContent(this.props.wfPath, this.props.wfPointer, data);
   }
 
   render() {
@@ -67,13 +66,15 @@ ReactCodeMirror.propTypes = {
 // Subscribes to the store
 const mapStateToProps = state => ({
   markdown: state.content.elementData.result,
-  workingFile: state.content.workingFile.path
+  wfPath: state.content.workingFile.path,
+  wfPointer: state.content.workingFile.pointer
 });
 
 // Binds action creators to the indicated prop object
 function mapDispatchToProps(dispatch) {
   return {
-    updateContent: (url, updateData) => dispatch(updateContent(url, updateData))
+    updateContent: (path, pointer, updateData) =>
+      dispatch(updateContent(path, pointer, updateData))
   };
 }
 
