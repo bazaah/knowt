@@ -14,7 +14,10 @@ type Result<T> = result::Result<T, fError>;
 pub fn show(path: PathBuf) -> Result<JsonValue> {
     let file = File::open(path)?;
     let data: JsonValue = ::serde_yaml::from_reader(file)?;
-    Ok(data)
+    let mut packet = JsonPacket::new(data);
+    packet.adjust();
+    let result = packet.take();
+    Ok(result)
 }
 
 pub fn show_pointer(path: PathBuf, pointer: String) -> Result<JsonValue> {
