@@ -20,7 +20,8 @@ impl JsonPacket {
             if let Some(value) = self.object.pointer_mut(&jpointer) {
                 match value.as_str() {
                     Some(s) if s.len() > jpointer.len() => {
-                        *value = jpointer.clone().into();
+                        let result = "{{".to_owned() + &jpointer.clone() + "}}";
+                        *value = result.into();
                     }
                     _ => {}
                 }
@@ -28,12 +29,12 @@ impl JsonPacket {
         }
     }
 
-    pub fn finish(self) -> JsonValue {
+    pub fn take(self) -> JsonValue {
         self.object
     }
 
     fn parse_json(json_value: &JsonValue) -> Vec<String> {
-        let mut queue: Vec<String> = Vec::new();
+        let mut list: Vec<String> = Vec::new();
         let mut jqueue: VecDeque<(&JsonValue, String)> = VecDeque::new();
         jqueue.push_back((json_value, String::default()));
 
@@ -53,12 +54,12 @@ impl JsonPacket {
                         jqueue.push_back((v, new_path));
                     }
                 }
-                Some((jString(_), s)) => queue.push(s),
+                Some((jString(_), s)) => list.push(s),
                 None => break,
                 _ => {}
             }
         }
 
-        queue
+        list
     }
 }
