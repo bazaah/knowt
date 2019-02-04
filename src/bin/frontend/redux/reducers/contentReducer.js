@@ -11,17 +11,22 @@ import {
   NEW_FILE_ERROR,
   NEW_FILE_LOADING,
   NEW_FILE_SUCCESS,
-  WORKING_FILE
+  ELEMENT_HAS_ERROR,
+  ELEMENT_IS_LOADING,
+  ELEMENT_FETCH_SUCCESS,
+  WORKING_FILE_PATH,
+  WORKING_FILE_ELEMENT
 } from "../actions/types";
 
 const initialState = {
   fileDirList: { result: [{}] },
   contentData: {
-    metadata: "stuff'n'things",
-    result: {
+    metadata: "stuff'n'things"
+    /*result: {
       content: "# Please click a file"
-    }
-  }
+    },*/
+  },
+  elementData: { result: "# Please click a file" }
 };
 
 // Reducer for content state
@@ -90,10 +95,36 @@ export default function(state = initialState, action) {
         ...state,
         newFileLoading: action.loading
       };
-    case WORKING_FILE:
+    case ELEMENT_FETCH_SUCCESS:
       return {
         ...state,
-        workingFile: action.file
+        elementData: action.payload
+      };
+    case ELEMENT_IS_LOADING:
+      return {
+        ...state,
+        elementLoading: action.loading
+      };
+    case ELEMENT_HAS_ERROR:
+      return {
+        ...state,
+        elementError: action.error
+      };
+    case WORKING_FILE_PATH:
+      return {
+        ...state,
+        workingFile: {
+          ...state.workingFile,
+          path: action.path
+        }
+      };
+    case WORKING_FILE_ELEMENT:
+      return {
+        ...state,
+        workingFile: {
+          ...state.workingFile,
+          pointer: action.pointer
+        }
       };
     default:
       return state;
