@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { fetchContent, workingFile } from "../redux/actions/contentActions";
+import { fetchContent, workingFilePath } from "../redux/actions/contentActions";
 
 // Controls the rows representing files in Navbar
 // Handles requesting the corresponding file from the server
@@ -17,7 +17,7 @@ class NavbarFile extends React.Component {
       .slice(1)
       .join("/")
       .concat("/"); // This is why I hate js array manipulation TODO: improve backend data so I can avoid this
-    this.props.workingFile(path.concat(fileName));
+    this.props.workingFilePath(path.concat(fileName));
     this.props.fetchContent("api/".concat(path.concat(fileName)));
   }
   render() {
@@ -32,7 +32,7 @@ class NavbarFile extends React.Component {
 
 NavbarFile.propTypes = {
   path: PropTypes.array,
-  workingFile: PropTypes.func.isRequired,
+  workingFilePath: PropTypes.func.isRequired,
   fetchContent: PropTypes.func.isRequired,
   file: PropTypes.string
 };
@@ -41,7 +41,7 @@ NavbarFile.propTypes = {
 function mapDispatchToProps(dispatch) {
   return {
     fetchContent: url => dispatch(fetchContent(url)),
-    workingFile: filePath => dispatch(workingFile(filePath))
+    workingFilePath: filePath => dispatch(workingFilePath(filePath))
   };
 }
 

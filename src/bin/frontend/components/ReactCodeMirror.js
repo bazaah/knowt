@@ -66,8 +66,8 @@ ReactCodeMirror.propTypes = {
 
 // Subscribes to the store
 const mapStateToProps = state => ({
-  markdown: state.content.contentData.result.content,
-  workingFile: state.content.workingFile
+  markdown: state.content.elementData.result,
+  workingFile: state.content.workingFile.path
 });
 
 // Binds action creators to the indicated prop object

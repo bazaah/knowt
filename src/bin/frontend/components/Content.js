@@ -22,7 +22,7 @@ class Content extends React.Component {
 
 // Subscribes to the store
 const mapStateToProps = state => ({
-  markdown: state.content.contentData.result.content,
+  markdown: state.content.elementData.result,
   bansaFilter: state.bansa.bansaFilter
 });
 
