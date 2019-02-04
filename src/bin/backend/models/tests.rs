@@ -21,8 +21,12 @@ fn models_show() {
             err
         }
     };
+    let unchanged_before = before.pointer("/classes/nfs::server/exports").unwrap();
+    let unchanged_after = after.pointer("/classes/nfs::server/exports").unwrap();
+    let changed_after = after.pointer("/content").unwrap();
 
-    assert_eq!(before, after);
+    assert_eq!(unchanged_before, unchanged_after);
+    assert_eq!(changed_after, "/content");
 }
 
 #[test]
