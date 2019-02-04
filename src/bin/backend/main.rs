@@ -20,7 +20,6 @@ mod proc;
 mod routes;
 mod settings;
 
-
 fn main() {
     // Initialize rocket with clap
     let init = initialization();
@@ -34,7 +33,7 @@ fn main() {
     rocket
         .mount(
             "/",
-            routes![new, view, view_field, update, file_tree, index, files],
+            routes![new, view, view_element, update, file_tree, index, files],
         )
         .attach(AdHoc::on_attach("Extra-Config", |rocket| {
             let root = rocket

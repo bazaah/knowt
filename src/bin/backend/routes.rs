@@ -32,8 +32,8 @@ pub fn view(config: State<ExtraConfig>, path: PathBuf) -> Json<JsonValue> {
     }
 }
 
-#[post("/api/vfield?<request..>")]
-pub fn view_field(config: State<ExtraConfig>, request: Form<PointerRequest>) -> Json<JsonValue> {
+#[get("/api/v1/element?<request..>")]
+pub fn view_element(config: State<ExtraConfig>, request: Form<PointerRequest>) -> Json<JsonValue> {
     let request: PointerRequest = request.into_inner();
     let (path, pointer) = request.take();
     let mut full_path = PathBuf::from(&config.get_root());
@@ -57,17 +57,22 @@ pub fn new(config: State<ExtraConfig>, file: Json<JsonValue>, path: PathBuf) -> 
     }
 }
 
-#[put("/api/<key>/<path..>", format = "application/json", data = "<data>")]
+#[put(
+    "/api/v1/update?<request..>",
+    format = "application/json",
+    data = "<update>"
+)]
 pub fn update(
     config: State<ExtraConfig>,
-    data: Json<JsonValue>,
-    key: String,
-    path: PathBuf,
+    request: Form<PointerRequest>,
+    update: Json<JsonValue>,
 ) -> Json<JsonValue> {
+    let request: PointerRequest = request.into_inner();
+    let (path, pointer) = request.take();
     let mut full_path = PathBuf::from(&config.get_root());
     full_path.push(path);
 
-    match update_data(&data.into_inner(), key, &full_path) {
+    match update_data(&update.into_inner(), &pointer, &full_path) {
         Ok(res) => Json(json!({"status": 200, "result": res})),
         Err(e) => Json(json!({"status": 500, "result": formated_error(&e)}
         )),
