@@ -1,6 +1,6 @@
 {
   "name": "knowt",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
   "description": "",
   "main": "index.js",
@@ -15,6 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.4",
@@ -29,6 +30,7 @@
     "webpack-dev-server": "^3.1.14"
   },
   "dependencies": {
+    "@babel/runtime": "^7.3.1",
     "@uiw/react-codemirror": "^1.0.15",
     "codemirror": "^5.40.2",
     "react": "^16.5.0",
