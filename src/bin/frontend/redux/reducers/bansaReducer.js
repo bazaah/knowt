@@ -6,7 +6,7 @@ import {
 } from "../actions/types";
 
 const initialState = {
-  bansaFilter: BansaFilter.MARKDOWN_VIEW,
+  bansaFilter: BansaFilter.TREE_VIEW,
   modalVisible: false
 };
 
