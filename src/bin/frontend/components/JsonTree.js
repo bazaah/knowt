@@ -4,24 +4,36 @@ import { connect } from "react-redux";
 import JsonViewer from "react-json-view";
 import {
   workingFileElement,
-  fetchElement
+  fetchElement,
+  updateContent
 } from "../redux/actions/contentActions";
+import { setBansaFilter } from "../redux/actions/bansaActions";
 
 class JsonTree extends React.Component {
   constructor(props) {
     super(props);
 
     this.handleSelect.bind(this);
+    this.handleEdit.bind(this);
+  }
+
+  handleEdit(callback) {
+    let pointer_array = [...callback.namespace, callback.name];
+    let pointer = "/".concat(pointer_array.join("/"));
+    this.props.updateContent(
+      this.props.workingFile.path,
+      pointer,
+      callback.new_value
+    );
   }
 
   handleSelect(callback) {
     const regex = /\{\{((\/[a-zA-Z0-9-_]+)+)\}\}/g;
     if (regex.test(callback.value)) {
       let jpointer = callback.value.replace(regex, "$2");
-      console.log(jpointer);
       this.props.workingFileElement(jpointer);
-      console.log(this.props.workingFile.pointer);
       this.props.fetchElement(this.props.workingFile.path, jpointer);
+      this.props.setBansaFilter("MARKDOWN_VIEW");
     }
   }
   render() {
@@ -33,9 +45,7 @@ class JsonTree extends React.Component {
         indentWidth={1}
         displayDataTypes={false}
         displayObjectSize={false}
-        onEdit={object => {
-          console.log(object);
-        }}
+        onEdit={edit => this.handleEdit(edit)}
         onSelect={select => this.handleSelect(select)}
       />
     );
@@ -44,7 +54,11 @@ class JsonTree extends React.Component {
 
 JsonTree.propTypes = {
   file: PropTypes.object,
-  workingFileElement: PropTypes.func.isRequired
+  workingFile: PropTypes.object.isRequired,
+  workingFileElement: PropTypes.func.isRequired,
+  fetchElement: PropTypes.func.isRequired,
+  updateContent: PropTypes.func.isRequired,
+  setBansaFilter: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -55,7 +69,10 @@ const mapStateToProps = state => ({
 function mapDispatchToProps(dispatch) {
   return {
     workingFileElement: pointer => dispatch(workingFileElement(pointer)),
-    fetchElement: (path, pointer) => dispatch(fetchElement(path, pointer))
+    fetchElement: (path, pointer) => dispatch(fetchElement(path, pointer)),
+    updateContent: (path, pointer, updateData) =>
+      dispatch(updateContent(path, pointer, updateData)),
+    setBansaFilter: view => dispatch(setBansaFilter(view))
   };
 }
 
