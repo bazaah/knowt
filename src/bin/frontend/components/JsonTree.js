@@ -17,23 +17,27 @@ class JsonTree extends React.Component {
     this.handleEdit.bind(this);
   }
 
-  handleEdit(callback) {
+  async handleEdit(callback) {
     let pointer_array = [...callback.namespace, callback.name];
     let pointer = "/".concat(pointer_array.join("/"));
-    this.props.updateContent(
+    await this.props.updateContent(
       this.props.workingFile.path,
       pointer,
       callback.new_value
     );
+    await this.props.fetchElement(this.props.workingFile, pointer);
   }
 
-  handleSelect(callback) {
+  async handleSelect(callback) {
     const regex = /\{\{((\/[a-zA-Z0-9-_]+)+)\}\}/g;
     if (regex.test(callback.value)) {
       let jpointer = callback.value.replace(regex, "$2");
-      this.props.workingFileElement(jpointer);
-      this.props.fetchElement(this.props.workingFile.path, jpointer);
-      this.props.setBansaFilter("MARKDOWN_VIEW");
+      await this.props.workingFileElement(jpointer);
+      await this.props.fetchElement(
+        this.props.workingFile.path,
+        this.props.workingFile.pointer
+      );
+      await this.props.setBansaFilter("MARKDOWN_VIEW");
     }
   }
   render() {
@@ -54,7 +58,7 @@ class JsonTree extends React.Component {
 
 JsonTree.propTypes = {
   file: PropTypes.object,
-  workingFile: PropTypes.object.isRequired,
+  workingFile: PropTypes.object,
   workingFileElement: PropTypes.func.isRequired,
   fetchElement: PropTypes.func.isRequired,
   updateContent: PropTypes.func.isRequired,
