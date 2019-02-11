@@ -48,7 +48,10 @@ pub fn update_data(content_update: &JsonValue, pointer: &str, path: &PathBuf) ->
         let yaml_str = ::serde_yaml::to_string(&yaml_file)?;
         yaml_deposit(yaml_str, &path);
     }
-    Ok(yaml_file)
+    let mut packet = JsonPacket::new(yaml_file);
+    packet.adjust();
+    let result = packet.take();
+    Ok(result)
 }
 
 // Main function for directory tree discovery
