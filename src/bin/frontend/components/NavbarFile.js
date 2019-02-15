@@ -18,7 +18,7 @@ class NavbarFile extends React.Component {
       .join("/")
       .concat("/"); // This is why I hate js array manipulation TODO: improve backend data so I can avoid this
     await this.props.workingFilePath(path.concat(fileName));
-    await this.props.fetchContent("api/".concat(path.concat(fileName)));
+    await this.props.fetchContent(path.concat(fileName));
   }
   render() {
     const name = this.props.file;
@@ -40,7 +40,7 @@ NavbarFile.propTypes = {
 //binds action creators to the indicated prop object
 function mapDispatchToProps(dispatch) {
   return {
-    fetchContent: url => dispatch(fetchContent(url)),
+    fetchContent: path => dispatch(fetchContent(path)),
     workingFilePath: filePath => dispatch(workingFilePath(filePath))
   };
 }

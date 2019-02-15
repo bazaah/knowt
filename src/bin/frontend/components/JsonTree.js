@@ -76,7 +76,8 @@ function mapDispatchToProps(dispatch) {
     fetchElement: (path, pointer) => dispatch(fetchElement(path, pointer)),
     updateContent: (path, pointer, updateData) =>
       dispatch(updateContent(path, pointer, updateData)),
-    setBansaFilter: view => dispatch(setBansaFilter(view))
+    setBansaFilter: view => dispatch(setBansaFilter(view)),
+    testApi: () => dispatch(testApi())
   };
 }
 

@@ -46,7 +46,7 @@ class NewFileModal extends React.Component {
   // Function for handling form submission
   // Formats user input and dispatches actions so that
   // the system properly reflects the new file
-  handleSubmit(event) {
+  async handleSubmit(event) {
     event.preventDefault();
     let path = this.state.pathValue.trim();
     let fmtPath = path.replace(/[^-0-9A-Za-z_]/g, " ");
@@ -66,13 +66,14 @@ class NewFileModal extends React.Component {
     }
 
     const fmtFilePath = fmtPath.concat(fmtName).trim();
-    const fullPath = "api/".concat(fmtFilePath);
 
-    this.props.newContent(fullPath, { content: "# New file created by Knowt" });
-    this.props.workingFilePath(fmtFilePath);
-    this.props.fetchFileDir("api/dir");
-    this.props.fetchContent(fullPath);
-    this.handleCloseModal(false);
+    await this.props.newContent(fmtFilePath, {
+      content: "# New file created by Knowt"
+    });
+    await this.props.workingFilePath(fmtFilePath);
+    await this.props.fetchFileDir("api/dir");
+    await this.props.fetchContent(fmtFilePath);
+    await this.handleCloseModal(false);
   }
 
   handleCloseModal(bool) {
@@ -152,10 +153,10 @@ const mapStateToProps = state => ({
 function mapDispatchToProps(dispatch) {
   return {
     showNewFileModal: bool => dispatch(showNewFileModal(bool)),
-    newContent: (url, data) => dispatch(newContent(url, data)),
+    newContent: (path, data) => dispatch(newContent(path, data)),
     workingFilePath: filePath => dispatch(workingFilePath(filePath)),
     fetchFileDir: url => dispatch(fetchFileDir(url)),
-    fetchContent: url => dispatch(fetchContent(url))
+    fetchContent: path => dispatch(fetchContent(path))
   };
 }
 
