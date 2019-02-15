@@ -908,6 +908,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "serde"
 version = "1.0.84"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "serde_derive 1.0.84 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "serde-hjson"
