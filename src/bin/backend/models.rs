@@ -1,6 +1,7 @@
 use crate::parse::JsonPacket;
 use crate::proc::yaml_deposit;
 use failure::{format_err, Error as fError};
+use serde::{Deserialize, Serialize};
 use serde_json::Value as JsonValue;
 use std::{fs, fs::File, path::PathBuf, result};
 use walkdir::{DirEntry, WalkDir};
@@ -11,7 +12,7 @@ type Result<T> = result::Result<T, fError>;
 
 // Main function for converting a yaml file into a json string
 // It returns a Result of JsonValue which is a serde provided struct that is easy to convert to/from json; or an error
-pub fn show(path: PathBuf) -> Result<JsonValue> {
+pub fn show(path: &PathBuf) -> Result<JsonValue> {
     let file = File::open(path)?;
     let data: JsonValue = ::serde_yaml::from_reader(file)?;
     let mut packet = JsonPacket::new(data);
@@ -20,7 +21,7 @@ pub fn show(path: PathBuf) -> Result<JsonValue> {
     Ok(result)
 }
 
-pub fn show_pointer(path: PathBuf, pointer: String) -> Result<JsonValue> {
+pub fn show_pointer(path: &PathBuf, pointer: &str) -> Result<JsonValue> {
     let file = File::open(path)?;
     let data: JsonValue = serde_yaml::from_reader(file)?;
     let result = data.pointer(&pointer);
@@ -115,6 +116,86 @@ pub struct PointerRequest {
 impl PointerRequest {
     pub fn take(self) -> (String, String) {
         (self.file_path, self.pointer_path)
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ApiRequest {
+    command: Option<CommandKind>,
+    data: Option<RequestData>,
+    version: Option<usize>,
+    id: Option<usize>,
+    ref_string: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct RequestData {
+    pub path: Option<String>,
+    pub pointer: Option<String>,
+    pub content: Option<JsonValue>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum CommandKind {
+    Create,
+    View,
+    Element,
+    Update,
+    Directory,
+}
+
+impl ApiRequest {
+    pub fn which(&self) -> Option<&CommandKind> {
+        self.command.as_ref()
+    }
+
+    pub fn get_data(&self) -> Option<&RequestData> {
+        self.data.as_ref()
+    }
+
+    pub fn get_identifiers(&self) -> (Option<&usize>, Option<&String>) {
+        (self.id.as_ref(), self.ref_string.as_ref())
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ApiResponse {
+    status: ResponseStatus,
+    result: Option<JsonValue>,
+    version: usize,
+    id: Option<usize>,
+    ref_string: Option<String>,
+}
+
+impl ApiResponse {
+    pub fn new(
+        code: usize,
+        message: Option<&str>,
+        result: Option<JsonValue>,
+        version: usize,
+        id: Option<usize>,
+        ref_string: Option<String>,
+    ) -> Self {
+        let status = ResponseStatus::new(code, message.map(|s| JsonValue::String(s.to_string())));
+        ApiResponse {
+            status,
+            result,
+            version,
+            id,
+            ref_string,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ResponseStatus {
+    code: usize,
+    message: Option<JsonValue>,
+}
+
+impl ResponseStatus {
+    pub fn new(code: usize, message: Option<JsonValue>) -> Self {
+        ResponseStatus { code, message }
     }
 }
 
