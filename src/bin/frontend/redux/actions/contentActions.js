@@ -20,35 +20,62 @@ import {
 
 // Async thunk meta action for file tree population
 // Returns an array of objects
-export function fetchFileDir(url) {
+export function fetchFileDir() {
+  let url = "api/v1/testing";
   return dispatch => {
     dispatch(fileDirLoading(true));
-
-    fetch(url)
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        command: "Directory",
+        version: 1
+      })
+    })
       .then(res => {
         dispatch(fileDirLoading(false));
         return res.json();
       })
-      .then(data => dispatch(fileDirFetchSuccess(data)));
+      .then(response => {
+        if (response.status.code !== 0) {
+          throw Error(response.status.message);
+        }
+        dispatch(fileDirFetchSuccess(response));
+      })
+      .catch(err => dispatch(fileDirError(true)));
   };
 }
 
 // Async thunk meta action for fetching the content
 // of an individual file
 // Returns a json object
-export function fetchContent(url) {
+export function fetchContent(path) {
+  let url = "api/v1/testing";
   return dispatch => {
     dispatch(contentLoading(true));
-    fetch(url)
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        command: "View",
+        version: 1,
+        data: { path: path }
+      })
+    })
       .then(res => {
-        // this doesn't work, investigate correct method
-        if (res.status !== 200) {
-          throw Error(res.result);
-        }
         dispatch(contentLoading(false));
         return res.json();
       })
-      .then(data => dispatch(contentFetchSuccess(data)))
+      .then(response => {
+        if (response.status.code !== 0) {
+          throw Error(response.status.message);
+        }
+        dispatch(contentFetchSuccess(response));
+      })
       .catch(() => dispatch(contentError(true)));
   };
 }
@@ -57,28 +84,31 @@ export function fetchContent(url) {
 // for a given file, with given data
 // Returns a json object
 export function updateContent(path, pointer, updateData) {
-  const endpoint = "api/v1/update?";
-  let params = { file_path: path, pointer_path: pointer };
-  const query = new URLSearchParams(params);
-  let url = endpoint.concat(query);
+  let url = "api/v1/testing";
 
   return dispatch => {
     dispatch(updateLoading(true));
     fetch(url, {
-      method: "PUT",
+      method: "POST",
       headers: {
         "content-type": "application/json"
       },
-      body: JSON.stringify(updateData)
+      body: JSON.stringify({
+        command: "Update",
+        version: 1,
+        data: { path: path, pointer: pointer, content: updateData }
+      })
     })
       .then(res => {
-        if (res.status !== 200) {
-          throw Error(res.result);
-        }
         dispatch(updateLoading(false));
         return res.json();
       })
-      .then(data => dispatch(updateSuccess(data)))
+      .then(response => {
+        if (response.status.code !== 0) {
+          throw Error(response.status.message);
+        }
+        dispatch(updateSuccess(response));
+      })
       .catch(() => dispatch(updateError(true)));
   };
 }
@@ -86,7 +116,8 @@ export function updateContent(path, pointer, updateData) {
 // Async thunk meta action for creating a file,
 // with the given path and data
 // Returns a status code
-export function newContent(url, newFile) {
+export function newContent(path, newFile) {
+  let url = "api/v1/testing";
   return dispatch => {
     dispatch(newFileLoading(true));
     fetch(url, {
@@ -94,39 +125,51 @@ export function newContent(url, newFile) {
       headers: {
         "content-type": "application/json"
       },
-      body: JSON.stringify(newFile)
+      body: JSON.stringify({
+        command: "Create",
+        version: 1,
+        data: { content: newFile, path: path }
+      })
     })
       .then(res => {
-        if (res.status !== 200) {
-          throw Error(res.status);
-        }
         dispatch(newFileLoading(false));
         return res.json();
       })
-      .then(code => dispatch(newFileSuccess(code)))
+      .then(response => {
+        if (response.status.code !== 0) {
+          throw Error(response.status.message);
+        }
+        dispatch(newFileSuccess(response));
+      })
       .catch(() => dispatch(updateError(true)));
   };
 }
 
 export function fetchElement(path, pointer) {
-  const endpoint = "api/v1/element?";
-  let params = { file_path: path, pointer_path: pointer };
-  const query = new URLSearchParams(params);
-  let url = endpoint.concat(query);
-
+  let url = "api/v1/testing";
   return dispatch => {
     dispatch(elementFetchLoading(true));
     fetch(url, {
-      method: "GET"
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        command: "Element",
+        version: 1,
+        data: { path: path, pointer: pointer }
+      })
     })
       .then(res => {
-        if (res.status !== 200) {
-          throw Error(res.status);
-        }
         dispatch(elementFetchLoading(false));
         return res.json();
       })
-      .then(element => dispatch(elementFetchSuccess(element)))
+      .then(response => {
+        if (response.status.code !== 0) {
+          throw Error(response.status.message);
+        }
+        dispatch(elementFetchSuccess(response));
+      })
       .catch(() => dispatch(elementFetchError(true)));
   };
 }
