@@ -21,7 +21,7 @@ import {
 // Async thunk meta action for file tree population
 // Returns an array of objects
 export function fetchFileDir() {
-  let url = "api/v1/testing";
+  let url = "api/v1/router";
   return dispatch => {
     dispatch(fileDirLoading(true));
     fetch(url, {
@@ -52,7 +52,7 @@ export function fetchFileDir() {
 // of an individual file
 // Returns a json object
 export function fetchContent(path) {
-  let url = "api/v1/testing";
+  let url = "api/v1/router";
   return dispatch => {
     dispatch(contentLoading(true));
     fetch(url, {
@@ -84,7 +84,7 @@ export function fetchContent(path) {
 // for a given file, with given data
 // Returns a json object
 export function updateContent(path, pointer, updateData) {
-  let url = "api/v1/testing";
+  let url = "api/v1/router";
 
   return dispatch => {
     dispatch(updateLoading(true));
@@ -117,7 +117,7 @@ export function updateContent(path, pointer, updateData) {
 // with the given path and data
 // Returns a status code
 export function newContent(path, newFile) {
-  let url = "api/v1/testing";
+  let url = "api/v1/router";
   return dispatch => {
     dispatch(newFileLoading(true));
     fetch(url, {
@@ -146,7 +146,7 @@ export function newContent(path, newFile) {
 }
 
 export function fetchElement(path, pointer) {
-  let url = "api/v1/testing";
+  let url = "api/v1/router";
   return dispatch => {
     dispatch(elementFetchLoading(true));
     fetch(url, {
