@@ -24,8 +24,8 @@ pub fn show(path: &PathBuf) -> Result<JsonValue> {
 pub fn show_pointer(path: &PathBuf, pointer: &str) -> Result<JsonValue> {
     let file = File::open(path)?;
     let data: JsonValue = serde_yaml::from_reader(file)?;
-    let result = data.pointer(&pointer);
-    result.cloned().ok_or(format_err!("Null"))
+    let result = data.pointer(pointer);
+    result.map(|r| r.to_owned()).ok_or(format_err!("Null"))
 }
 
 // Main function for creating new yaml files
@@ -107,15 +107,230 @@ pub fn formated_error(err: &::failure::Error) -> String {
     format
 }
 
-#[derive(FromForm)]
-pub struct PointerRequest {
-    file_path: String,
-    pointer_path: String,
-}
-
-impl PointerRequest {
-    pub fn take(self) -> (String, String) {
-        (self.file_path, self.pointer_path)
+pub fn respond(request: ApiRequest, root_path: &str) -> ApiResponse {
+    let ident = request.get_identifiers();
+    let (id, rstring) = (ident.0.cloned(), ident.1.cloned());
+    match request.which() {
+        Some(CommandKind::Create) => {
+            let mut full_path = PathBuf::from(root_path);
+            let (path, content) = match request.get_data() {
+                Some(d) => {
+                    let path = match &d.path {
+                        Some(path) => path,
+                        None => {
+                            return ApiResponse::new(
+                                1,
+                                Some("Error: command 'create' requires data.path"),
+                                None,
+                                1,
+                                id,
+                                rstring,
+                            );
+                        }
+                    };
+                    let content = match &d.content {
+                        Some(content) => content,
+                        None => {
+                            return ApiResponse::new(
+                                1,
+                                Some("Error: command 'create' requires data.content"),
+                                None,
+                                1,
+                                id,
+                                rstring,
+                            );
+                        }
+                    };
+                    (path, content)
+                }
+                None => {
+                    return ApiResponse::new(
+                        1,
+                        Some("Error: command 'create' requires data"),
+                        None,
+                        1,
+                        id,
+                        rstring,
+                    );
+                }
+            };
+            full_path.push(path);
+            match create(content, &full_path) {
+                Ok(()) => ApiResponse::new(0, None, None, 1, id, rstring),
+                Err(e) => ApiResponse::new(1, Some(&formated_error(&e)), None, 1, id, rstring),
+            }
+        }
+        Some(CommandKind::View) => {
+            let mut full_path = PathBuf::from(root_path);
+            let path = match request.get_data() {
+                Some(d) => {
+                    let path = match &d.path {
+                        Some(path) => path,
+                        None => {
+                            return ApiResponse::new(
+                                1,
+                                Some("Error: command 'view' requires data.path"),
+                                None,
+                                1,
+                                id,
+                                rstring,
+                            );
+                        }
+                    };
+                    path
+                }
+                None => {
+                    return ApiResponse::new(
+                        1,
+                        Some("Error: command 'view' requires data"),
+                        None,
+                        1,
+                        id,
+                        rstring,
+                    );
+                }
+            };
+            full_path.push(path);
+            match show(&full_path) {
+                Ok(file) => ApiResponse::new(0, None, Some(file), 1, id, rstring),
+                Err(e) => ApiResponse::new(1, Some(&formated_error(&e)), None, 1, id, rstring),
+            }
+        }
+        Some(CommandKind::Element) => {
+            let mut full_path = PathBuf::from(root_path);
+            let (path, pointer) = match request.get_data() {
+                Some(d) => {
+                    let path = match &d.path {
+                        Some(path) => path,
+                        None => {
+                            return ApiResponse::new(
+                                1,
+                                Some("Error: command 'element' requires data.path"),
+                                None,
+                                1,
+                                id,
+                                rstring,
+                            );
+                        }
+                    };
+                    let pointer = match &d.pointer {
+                        Some(pointer) => pointer,
+                        None => {
+                            return ApiResponse::new(
+                                1,
+                                Some("Error: command 'element' requires data.pointer"),
+                                None,
+                                1,
+                                id,
+                                rstring,
+                            );
+                        }
+                    };
+                    (path, pointer)
+                }
+                None => {
+                    return ApiResponse::new(
+                        1,
+                        Some("Error: command 'element' requires data"),
+                        None,
+                        1,
+                        id,
+                        rstring,
+                    );
+                }
+            };
+            full_path.push(path);
+            match show_pointer(&full_path, pointer) {
+                Ok(element) => ApiResponse::new(0, None, Some(element), 1, id, rstring),
+                Err(e) => ApiResponse::new(1, Some(&formated_error(&e)), None, 1, id, rstring),
+            }
+        }
+        Some(CommandKind::Update) => {
+            let mut full_path = PathBuf::from(root_path);
+            let (update, path, pointer) = match request.get_data() {
+                Some(d) => {
+                    let path = match &d.path {
+                        Some(path) => path,
+                        None => {
+                            return ApiResponse::new(
+                                1,
+                                Some("Error: command 'update' requires data.path"),
+                                None,
+                                1,
+                                id,
+                                rstring,
+                            );
+                        }
+                    };
+                    let pointer = match &d.pointer {
+                        Some(pointer) => pointer,
+                        None => {
+                            return ApiResponse::new(
+                                1,
+                                Some("Error: command 'update' requires data.pointer"),
+                                None,
+                                1,
+                                id,
+                                rstring,
+                            );
+                        }
+                    };
+                    let update = match &d.content {
+                        Some(update) => update,
+                        None => {
+                            return ApiResponse::new(
+                                1,
+                                Some("Error: command 'update' requires data.content"),
+                                None,
+                                1,
+                                id,
+                                rstring,
+                            );
+                        }
+                    };
+                    (update, path, pointer)
+                }
+                None => {
+                    return ApiResponse::new(
+                        1,
+                        Some("Error: command 'update' requires data"),
+                        None,
+                        1,
+                        id,
+                        rstring,
+                    );
+                }
+            };
+            full_path.push(path);
+            match update_data(update, pointer, &full_path) {
+                Ok(update) => ApiResponse::new(0, None, Some(update), 1, id, rstring),
+                Err(e) => ApiResponse::new(1, Some(&formated_error(&e)), None, 1, id, rstring),
+            }
+        }
+        Some(CommandKind::Directory) => {
+            let path = PathBuf::from(root_path);
+            match dir_tree(&path) {
+                Some(directory) => {
+                    ApiResponse::new(0, None, Some(JsonValue::Array(directory)), 1, id, rstring)
+                }
+                None => ApiResponse::new(
+                    1,
+                    Some("Error: file tree at given path not found"),
+                    None,
+                    1,
+                    id,
+                    rstring,
+                ),
+            }
+        }
+        None => ApiResponse::new(
+            1,
+            Some("Error: 'command' field required"),
+            None,
+            1,
+            id,
+            rstring,
+        ),
     }
 }
 
