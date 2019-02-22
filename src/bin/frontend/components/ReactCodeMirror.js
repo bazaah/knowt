@@ -1,7 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { updateContent } from "../redux/actions/contentActions";
+import {
+  updateContent,
+  elementFetchSuccess
+} from "../redux/actions/contentActions";
 
 // Due to legacy css in codemirror, some webpack
 // loaders need to be disabled
@@ -33,8 +36,13 @@ class ReactCodeMirror extends React.Component {
     }
   }
 
-  handleBlur(data) {
-    this.props.updateContent(this.props.wfPath, this.props.wfPointer, data);
+  async handleBlur(data) {
+    await this.props.updateContent(
+      this.props.wfPath,
+      this.props.wfPointer,
+      data
+    );
+    await this.props.elementFetchSuccess({ result: data });
   }
 
   render() {
@@ -60,7 +68,8 @@ class ReactCodeMirror extends React.Component {
 ReactCodeMirror.propTypes = {
   markdown: PropTypes.string,
   workingFile: PropTypes.string,
-  updateContent: PropTypes.func.isRequired
+  updateContent: PropTypes.func.isRequired,
+  elementFetchSuccess: PropTypes.func.isRequired
 };
 
 // Subscribes to the store
@@ -74,7 +83,8 @@ const mapStateToProps = state => ({
 function mapDispatchToProps(dispatch) {
   return {
     updateContent: (path, pointer, updateData) =>
-      dispatch(updateContent(path, pointer, updateData))
+      dispatch(updateContent(path, pointer, updateData)),
+    elementFetchSuccess: element => dispatch(elementFetchSuccess(element))
   };
 }
 
