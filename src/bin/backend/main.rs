@@ -31,10 +31,7 @@ fn main() {
         None => rocket::ignite(),
     };
     rocket
-        .mount(
-            "/",
-            routes![new, view, view_element, update, file_tree, index, files, api_router],
-        )
+        .mount("/", routes![index, files, api_router])
         .attach(AdHoc::on_attach("Extra-Config", |rocket| {
             let root = rocket
                 .config()
