@@ -334,6 +334,168 @@ pub fn respond(request: ApiRequest, root_path: &str) -> ApiResponse {
     }
 }
 
+pub fn respond_help(command: Option<CommandKind>) -> ApiResponse {
+    fn generate_help(change_list: Option<Vec<(&str, JsonValue)>>) -> JsonValue {
+        let mut skeleton = json!({
+            "summary": "Interface for interacting with Knowt",
+            "description": "The following schema is a complete representation of a request object, including all optional fields",
+            "schema": {
+                "properties": {
+                    "command": {
+                        "description": "Instruction to carry out",
+                        "type": "string",
+                        "value": [CommandKind::Create, CommandKind::Directory, CommandKind::Element, CommandKind::Update, CommandKind::View]
+                    },
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "path": {
+                                "description": "Relative path from server root",
+                                "type": "string"
+                            },
+                            "pointer": {
+                                "description": "JSON pointer to a specific value",
+                                "type": "string",
+                            },
+                            "content": {
+                                "description": "Data to initialize file with",
+                                "type": "JSON"
+                            },
+                        },
+                        "required": "",
+                    },
+                    "version": {
+                        "description": "Schema version",
+                        "type": "usize"
+                    },
+                    "id": {
+                        "description": "Optional request identifier",
+                        "type": "usize"
+                    },
+                    "ref_string": {
+                        "description": "Optional request identifier",
+                        "type": "string"
+                    }
+                },
+                "required": ["command", "data", "version"]
+            }
+        });
+
+        match change_list {
+            Some(items) => {
+                items.into_iter().for_each(|item| {
+                    let (pointer, change) = item;
+                    *skeleton.pointer_mut(pointer).unwrap() = change;
+                });
+                skeleton
+            }
+            None => skeleton,
+        }
+    }
+
+    match command {
+        Some(CommandKind::Create) => {
+            let changes = vec![
+                ("/summary", json!("Create a new YAML file")),
+                (
+                    "/description",
+                    json!("The following schema contains the subset of fields required by Create"),
+                ),
+                (
+                    "/schema/properties/command/value",
+                    json!([CommandKind::Create]),
+                ),
+                ("/schema/data/required", json!(["path", "content"])),
+            ];
+            let help = generate_help(Some(changes));
+
+            ApiResponse::new(0, None, Some(help), 1, None, None)
+        }
+        Some(CommandKind::Directory) => {
+            let changes = vec![
+                (
+                    "/summary",
+                    json!("Find all .yaml files in the content directory root"),
+                ),
+                (
+                    "/description",
+                    json!(
+                        "The following schema contains the subset of fields required by Directory"
+                    ),
+                ),
+                ("/schema/required", json!(["command", "version"])),
+                (
+                    "/schema/properties/command/value",
+                    json!([CommandKind::Directory]),
+                ),
+            ];
+            let help = generate_help(Some(changes));
+
+            ApiResponse::new(0, None, Some(help), 1, None, None)
+        }
+        Some(CommandKind::Element) => {
+            let changes =
+                vec![
+                ("/summary", json!("View one element of a .yaml file")),
+                (
+                    "/description",
+                    json!("The following schema contains the subset of fields required by Element"),
+                ),
+                (
+                    "/schema/properties/command/value",
+                    json!([CommandKind::Element]),
+                ),
+                ("/schema/data/required", json!(["path", "pointer" , "content"])),
+            ];
+            let help = generate_help(Some(changes));
+
+            ApiResponse::new(0, None, Some(help), 1, None, None)
+        }
+        Some(CommandKind::Update) => {
+            let changes = vec![
+                ("/summary", json!("Update an element of a file")),
+                (
+                    "/description",
+                    json!("The following schema contains the subset of fields required by Update"),
+                ),
+                (
+                    "/schema/properties/command/value",
+                    json!([CommandKind::Update]),
+                ),
+                (
+                    "/schema/data/required",
+                    json!(["path", "pointer", "content"]),
+                ),
+            ];
+            let help = generate_help(Some(changes));
+
+            ApiResponse::new(0, None, Some(help), 1, None, None)
+        }
+        Some(CommandKind::View) => {
+            let changes = vec![
+                ("/summary", json!("View a parsed file")),
+                (
+                    "/description",
+                    json!("The following schema contains the subset of fields required by View"),
+                ),
+                (
+                    "/schema/properties/command/value",
+                    json!([CommandKind::View]),
+                ),
+                ("/schema/data/required", json!(["path"])),
+            ];
+            let help = generate_help(Some(changes));
+
+            ApiResponse::new(0, None, Some(help), 1, None, None)
+        }
+        None => {
+            let help = generate_help(None);
+
+            ApiResponse::new(0, None, Some(help), 1, None, None)
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct ApiRequest {
     command: Option<CommandKind>,
@@ -357,6 +519,19 @@ pub enum CommandKind {
     Element,
     Update,
     Directory,
+}
+
+impl CommandKind {
+    pub fn which(identifier: &str) -> Option<CommandKind> {
+        match identifier {
+            "Create" | "create" => Some(CommandKind::Create),
+            "Directory" | "directory" => Some(CommandKind::Directory),
+            "Element" | "element" => Some(CommandKind::Element),
+            "Update" | "update" => Some(CommandKind::Update),
+            "View" | "view" => Some(CommandKind::View),
+            _ => None,
+        }
+    }
 }
 
 impl ApiRequest {
