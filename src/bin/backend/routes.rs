@@ -26,6 +26,21 @@ pub fn api_router(config: State<ExtraConfig>, request: Json<ApiRequest>) -> Json
     Json(response)
 }
 
+#[get("/api/v1/help")]
+pub fn documentation() -> Json<ApiResponse> {
+    let response = respond_help(None);
+
+    Json(response)
+}
+
+#[get("/api/v1/help?<command>")]
+pub fn documentation_command(command: String) -> Json<ApiResponse> {
+    let kind = CommandKind::which(command.as_str());
+    let response = respond_help(kind);
+
+    Json(response)
+}
+
 // -- Being phased out kept around for reference for now
 // #[get("/api/<path..>")]
 // pub fn view(config: State<ExtraConfig>, path: PathBuf) -> Json<JsonValue> {
