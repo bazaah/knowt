@@ -14,7 +14,7 @@ fn models_show() {
 
     let before: JsonValue =
         serde_yaml::from_slice(data.as_slice()).expect("Failed to parse file: serde_yaml");
-    let after = match show(path) {
+    let after = match show(&path) {
         Ok(json) => json,
         Err(e) => {
             let err: JsonValue = json!({ "error in show": formated_error(&e) });
@@ -44,7 +44,7 @@ fn models_show_pointer() {
         serde_yaml::from_slice(data.as_slice()).expect("Failed to parse file: serde_yaml");
     let before = json.pointer(&pointer).unwrap();
 
-    let after = match show_pointer(path, pointer.to_string()) {
+    let after = match show_pointer(&path, &pointer.to_string()) {
         Ok(pointer) => pointer,
         Err(e) => {
             let err: JsonValue = json!({ "error in show_pointer": formated_error(&e) });
